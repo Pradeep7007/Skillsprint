@@ -178,7 +178,7 @@ const Dashboard = () => {
               <div className="alert alert-warning border-0 p-3 mb-4 d-flex align-items-start" style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)', color: 'var(--color-warning)' }}>
                 <i className="bi bi-info-circle-fill me-2 fs-5 mt-1"></i>
                 <div>
-                  <strong>Attention:</strong> This is a secure, camera-proctored examination. Attempting to violate the rules will log warnings in the database and automatically terminate your test.
+                  <strong>Attention:</strong> This is a secure examination environment. Attempting to violate the rules will log warnings in the database for proctor evaluation.
                 </div>
               </div>
 
@@ -197,21 +197,9 @@ const Dashboard = () => {
                   </div>
                 </li>
                 <li className="list-group-item bg-transparent text-secondary border-0 px-0 py-2 d-flex align-items-start">
-                  <i className="bi bi-camera-video-fill text-primary me-2"></i>
-                  <div>
-                    <strong>Webcam Integrity Check:</strong> Access to your webcam is required. A silent background check runs to ensure candidate presence and compliance.
-                  </div>
-                </li>
-                <li className="list-group-item bg-transparent text-secondary border-0 px-0 py-2 d-flex align-items-start">
                   <i className="bi bi-mouse-fill text-primary me-2"></i>
                   <div>
                     <strong>Disabled Actions:</strong> Right-clicks, Copy-Paste, Text Selection, and developer keybinds (F12, Ctrl+Shift+I, Ctrl+U) are locked.
-                  </div>
-                </li>
-                <li className="list-group-item bg-transparent text-secondary border-0 px-0 py-2 d-flex align-items-start text-danger fw-semibold">
-                  <i className="bi bi-exclamation-triangle-fill text-danger me-2"></i>
-                  <div>
-                    <strong>Auto Submit Trigger:</strong> Accumulating exactly 3 violation logs will result in the exam being automatically submitted instantly.
                   </div>
                 </li>
               </ul>
@@ -225,7 +213,7 @@ const Dashboard = () => {
                   onChange={(e) => setTermsAccepted(e.target.checked)}
                 />
                 <label className="form-check-label small fw-semibold text-secondary" htmlFor="acceptTerms" style={{ cursor: 'pointer' }}>
-                  I consent to sharing my camera feed, agree to the fullscreen policy, and acknowledge that 3 violations will auto-submit my exam.
+                  I agree to the test integrity guidelines, academic honesty rules, and fullscreen assessment policy.
                 </label>
               </div>
             </div>

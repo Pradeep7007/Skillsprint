@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -27,15 +27,18 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminQuestions from './pages/AdminQuestions';
 import AdminViolations from './pages/AdminViolations';
 
-function App() {
+function AppContent() {
+  const location = useLocation();
+  const isTestRoute = location.pathname.startsWith('/test/');
+
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <Router>
-          <div className="d-flex flex-column min-vh-100" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
-            <Navbar />
-            <main className="flex-grow-1">
-              <Routes>
+    <div
+      className={`d-flex flex-column ${isTestRoute ? 'vh-100 overflow-hidden' : 'min-vh-100'}`}
+      style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}
+    >
+      {!isTestRoute && <Navbar />}
+      <main className={`flex-grow-1 ${isTestRoute ? 'overflow-hidden d-flex flex-column' : ''}`}>
+        <Routes>
                 {/* Public Auth Routes */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
@@ -108,8 +111,17 @@ function App() {
                 <Route path="*" element={<Dashboard />} />
               </Routes>
             </main>
-            <Footer />
+            {!isTestRoute && <Footer />}
           </div>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        <Router>
+          <AppContent />
         </Router>
       </AuthProvider>
     </ThemeProvider>

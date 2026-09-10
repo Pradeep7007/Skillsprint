@@ -31,12 +31,7 @@ export const useProctor = ({ active, onViolation, onAutoSubmit }) => {
     // Log to DB
     logViolationToDB(type, details);
 
-    // Check auto-submit threshold
-    if (newCount >= 3) {
-      if (onAutoSubmit) {
-        onAutoSubmit();
-      }
-    }
+    // Note: Violations are logged to DB and notified to onViolation without auto-submitting.
   };
 
   useEffect(() => {
