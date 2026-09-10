@@ -67,8 +67,8 @@ const importData = async () => {
     });
 
     console.log('Default users seeded successfully:');
-    console.log(' - Admin: admin@portal.com / adminPassword123');
-    console.log(' - Student: student@portal.com / studentPassword123');
+    console.log(' - Admin: admin@portal.com / admin123');
+    console.log(' - Student: student@portal.com / student123');
 
     console.log('Database Seeding Completed!');
     process.exit();
