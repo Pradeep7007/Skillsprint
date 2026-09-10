@@ -1,0 +1,1141 @@
+[
+  {
+    "category": "Aptitude",
+    "topic": "Number System",
+    "difficulty": "Easy",
+    "question": "What is the unit digit in the product (3^65 * 6^59 * 7^71)?",
+    "options": ["1", "2", "4", "6"],
+    "correctAnswer": "4",
+    "explanation": "Unit digit of 3^65 = 3^(4*16 + 1) = 3^1 = 3. Unit digit of 6^59 = 6. Unit digit of 7^71 = 7^(4*17 + 3) = 7^3 = 3. Product of unit digits = 3 * 6 * 3 = 54. Therefore, the unit digit is 4."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "Number System",
+    "difficulty": "Medium",
+    "question": "A number when divided by 296 leaves 75 as remainder. If the same number is divided by 37, the remainder will be:",
+    "options": ["1", "2", "8", "11"],
+    "correctAnswer": "1",
+    "explanation": "Let the number be N = 296k + 75. Since 296 is a multiple of 37 (37 * 8 = 296), N = 37 * (8k) + 37 * 2 + 1. So, N divided by 37 leaves a remainder of 1."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "LCM",
+    "difficulty": "Easy",
+    "question": "Find the LCM of 2/3, 3/5, 4/7 and 9/13.",
+    "options": ["36", "1/36", "12/455", "36/455"],
+    "correctAnswer": "36",
+    "explanation": "LCM of fractions = LCM of Numerators / HCF of Denominators. Numerators are 2, 3, 4, 9 (LCM = 36). Denominators are 3, 5, 7, 13 (HCF = 1). LCM = 36/1 = 36."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "LCM",
+    "difficulty": "Medium",
+    "question": "Three bells toll together at intervals of 9, 12, 15 minutes respectively. If they toll together now, after how many hours will they toll together next?",
+    "options": ["3 hours", "6 hours", "9 hours", "12 hours"],
+    "correctAnswer": "3 hours",
+    "explanation": "LCM of 9, 12, and 15 is 180 minutes. 180 minutes = 180/60 = 3 hours."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "HCF",
+    "difficulty": "Easy",
+    "question": "Find the HCF of 18/25, 12/10, and 24/35.",
+    "options": ["6/350", "6/5", "6/175", "12/175"],
+    "correctAnswer": "6/175",
+    "explanation": "HCF of fractions = HCF of Numerators / LCM of Denominators. HCF(18, 12, 24) = 6. LCM(25, 10, 35) = 175. Thus, HCF = 6/175."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "HCF",
+    "difficulty": "Medium",
+    "question": "The HCF of two numbers is 11 and their LCM is 7700. If one of the numbers is 275, find the other.",
+    "options": ["279", "308", "318", "440"],
+    "correctAnswer": "308",
+    "explanation": "Product of two numbers = HCF * LCM. 275 * X = 11 * 7700. X = (11 * 7700) / 275 = 308."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "Percentage",
+    "difficulty": "Easy",
+    "question": "If A's salary is 25% more than B's salary, then by what percent is B's salary less than A's salary?",
+    "options": ["15%", "20%", "25%", "30%"],
+    "correctAnswer": "20%",
+    "explanation": "Let B's salary be 100. Then A's salary is 125. Difference is 25. B's salary is less than A's by (25 / 125) * 100 = 20%."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "Percentage",
+    "difficulty": "Medium",
+    "question": "Due to a 20% reduction in the price of sugar, a man can buy 5 kg more sugar for $100. Find the original price of sugar per kg.",
+    "options": ["$4.00", "$5.00", "$6.00", "$8.00"],
+    "correctAnswer": "$5.00",
+    "explanation": "Let original price be P. New price = 0.8P. Quantity bought originally = 100/P. New quantity = 100/0.8P. Difference: 100/0.8P - 100/P = 5 => 125/P - 100/P = 5 => 25/P = 5 => P = 5."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "Profit and Loss",
+    "difficulty": "Easy",
+    "question": "An article is sold for $300 at a loss of 25%. What is the cost price of the article?",
+    "options": ["$375", "$400", "$425", "$450"],
+    "correctAnswer": "$400",
+    "explanation": "Loss is 25%, meaning selling price is 75% of Cost Price. 0.75 * CP = 300 => CP = 300 / 0.75 = 400."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "Profit and Loss",
+    "difficulty": "Medium",
+    "question": "A shopkeeper marks his goods 30% above the cost price and gives a discount of 10% on the marked price. Find his gain percentage.",
+    "options": ["17%", "20%", "23%", "27%"],
+    "correctAnswer": "17%",
+    "explanation": "Let CP = 100. Marked Price (MP) = 130. Discount = 10% of 130 = 13. Selling Price (SP) = 130 - 13 = 117. Gain = 117 - 100 = 17%."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "Ratio",
+    "difficulty": "Easy",
+    "question": "If A : B = 2 : 3 and B : C = 4 : 5, find A : B : C.",
+    "options": ["8 : 12 : 15", "2 : 4 : 5", "6 : 9 : 15", "8 : 10 : 15"],
+    "correctAnswer": "8 : 12 : 15",
+    "explanation": "Multiply A:B by 4 to get 8:12. Multiply B:C by 3 to get 12:15. Combining them gives A:B:C = 8:12:15."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "Ratio",
+    "difficulty": "Medium",
+    "question": "A sum of money is divided among A, B, C, D in the ratio of 5:2:4:3. If C gets $1000 more than D, what is B's share?",
+    "options": ["$500", "$1500", "$2000", "$2500"],
+    "correctAnswer": "$2000",
+    "explanation": "Let shares be 5x, 2x, 4x, 3x. C's share - D's share = 4x - 3x = x = 1000. B's share is 2x = 2 * 1000 = 2000."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "Average",
+    "difficulty": "Easy",
+    "question": "The average of 5 consecutive odd numbers is 25. What is the largest of these numbers?",
+    "options": ["27", "29", "31", "33"],
+    "correctAnswer": "29",
+    "explanation": "The average of consecutive numbers is the middle term. So the numbers are 21, 23, 25, 27, 29. The largest is 29."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "Average",
+    "difficulty": "Medium",
+    "question": "The average weight of 8 persons increases by 2.5 kg when a new person comes in place of one of them weighing 65 kg. What is the weight of the new person?",
+    "options": ["70 kg", "75 kg", "80 kg", "85 kg"],
+    "correctAnswer": "85 kg",
+    "explanation": "Total weight increase = 8 * 2.5 = 20 kg. Weight of new person = weight of replaced person + increase = 65 + 20 = 85 kg."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "SI",
+    "difficulty": "Easy",
+    "question": "A sum of money at simple interest doubles itself in 8 years. What is the rate of interest per annum?",
+    "options": ["10%", "12.5%", "15%", "16.67%"],
+    "correctAnswer": "12.5%",
+    "explanation": "If Principal P doubles, the Simple Interest (SI) gained is P. SI = (P * R * T) / 100 => P = (P * R * 8) / 100 => R = 100 / 8 = 12.5%."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "SI",
+    "difficulty": "Medium",
+    "question": "A sum of $12,500 amounts to $15,500 in 4 years at simple interest. What is the rate of interest?",
+    "options": ["3%", "4%", "5%", "6%"],
+    "correctAnswer": "6%",
+    "explanation": "SI = Amount - Principal = 15500 - 12500 = 3000. SI = (P * R * T) / 100 => 3000 = (12500 * R * 4) / 100 => 3000 = 500 * R => R = 6%."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "CI",
+    "difficulty": "Easy",
+    "question": "Find the compound interest on $10,000 for 2 years at 10% per annum compounded annually.",
+    "options": ["$2000", "$2100", "$2200", "$2300"],
+    "correctAnswer": "$2100",
+    "explanation": "Amount = P(1 + R/100)^T = 10000(1.1)^2 = 12100. CI = Amount - Principal = 12100 - 10000 = 2100."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "CI",
+    "difficulty": "Medium",
+    "question": "The difference between simple and compound interest on a sum of money for 2 years at 5% per annum is $15. Find the sum.",
+    "options": ["$5000", "$6000", "$7000", "$8000"],
+    "correctAnswer": "$6000",
+    "explanation": "Difference for 2 years (CI - SI) = P * (R/100)^2. 15 = P * (5/100)^2 => 15 = P * (1/400) => P = 15 * 400 = 6000."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "Time and Work",
+    "difficulty": "Easy",
+    "question": "A can do a piece of work in 10 days and B can do it in 15 days. In how many days can they complete it working together?",
+    "options": ["5 days", "6 days", "8 days", "9 days"],
+    "correctAnswer": "6 days",
+    "explanation": "A's 1-day work = 1/10. B's 1-day work = 1/15. Together 1-day work = 1/10 + 1/15 = 5/30 = 1/6. Time taken = 6 days."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "Time and Work",
+    "difficulty": "Medium",
+    "question": "A is twice as efficient as B and together they finish a work in 14 days. In how many days can A alone finish the work?",
+    "options": ["21 days", "28 days", "35 days", "42 days"],
+    "correctAnswer": "21 days",
+    "explanation": "Ratio of efficiency A:B = 2:1. Together efficiency = 3 units/day. Total work = 3 * 14 = 42 units. A's time = 42 / 2 = 21 days."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "Time and Distance",
+    "difficulty": "Easy",
+    "question": "A train 120 m long passes a telegraph post in 6 seconds. Find the speed of the train in km/h.",
+    "options": ["60 km/h", "72 km/h", "80 km/h", "90 km/h"],
+    "correctAnswer": "72 km/h",
+    "explanation": "Speed = Distance / Time = 120 / 6 = 20 m/s. In km/h = 20 * 18/5 = 72 km/h."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "Time and Distance",
+    "difficulty": "Medium",
+    "question": "A man walks at a speed of 4 km/h and runs at 8 km/h. If he covers equal distances walking and running to complete a total journey of 24 km, find the total time taken.",
+    "options": ["3.5 hours", "4 hours", "4.5 hours", "5 hours"],
+    "correctAnswer": "4.5 hours",
+    "explanation": "Equal distances = 12 km walking and 12 km running. Time walking = 12/4 = 3 hours. Time running = 12/8 = 1.5 hours. Total time = 3 + 1.5 = 4.5 hours."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "Ages",
+    "difficulty": "Easy",
+    "question": "The ratio of ages of Ram and Shyam is 4:5. If the sum of their ages is 81, what is Shyam's age?",
+    "options": ["36", "45", "54", "60"],
+    "correctAnswer": "45",
+    "explanation": "Ram's age = 4x, Shyam's age = 5x. 4x + 5x = 9x = 81 => x = 9. Shyam's age = 5 * 9 = 45."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "Ages",
+    "difficulty": "Medium",
+    "question": "Ten years ago, a father was four times as old as his son. Ten years hence, the father will be twice as old as his son. Find the present age of the father.",
+    "options": ["40 years", "50 years", "60 years", "70 years"],
+    "correctAnswer": "50 years",
+    "explanation": "Let son 10 years ago be x, father be 4x. Now: son = x+10, father = 4x+10. In 10 years: son = x+20, father = 4x+20. Given: 4x+20 = 2(x+20) => 4x+20 = 2x+40 => 2x = 20 => x = 10. Present father's age = 4(10)+10 = 50."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "Number System",
+    "difficulty": "Hard",
+    "question": "Find the remainder when 2^256 is divided by 17.",
+    "options": ["1", "2", "16", "15"],
+    "correctAnswer": "1",
+    "explanation": "2^4 = 16 = -1 (mod 17). Thus, 2^256 = (2^4)^64 = (-1)^64 = 1 (mod 17). The remainder is 1."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "Percentage",
+    "difficulty": "Hard",
+    "question": "In an election, 10% of voters did not cast their vote, and 10% of votes cast were declared invalid. The winning candidate got 54% of the valid votes and won by a majority of 1620 votes. Find the total number of registered voters.",
+    "options": ["20000", "25000", "30000", "40000"],
+    "correctAnswer": "25000",
+    "explanation": "Let total voters = x. Cast votes = 0.9x. Valid votes = 0.9 * 0.9x = 0.81x. Winner got 54%, meaning loser got 46%. Majority = 8% of valid votes. 0.08 * 0.81x = 1620 => 0.0648x = 1620 => x = 25000."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "Time and Work",
+    "difficulty": "Hard",
+    "question": "A, B, and C can complete a work in 20, 30, and 60 days respectively. If A is assisted by B and C on every third day, in how many days will the work be finished?",
+    "options": ["12 days", "15 days", "16 days", "18 days"],
+    "correctAnswer": "15 days",
+    "explanation": "Work rates: A=3/60, B=2/60, C=1/60. Day 1: A works (3/60). Day 2: A works (3/60). Day 3: A+B+C work (6/60). 3-day cycle total work = 3/60 + 3/60 + 6/60 = 12/60 = 1/5. To complete work (5/5), we need 5 cycles. 5 cycles * 3 days = 15 days."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "SI",
+    "difficulty": "Hard",
+    "question": "A person borrows $5000 at 5% simple interest. He immediately lends it to another person at 6.25% simple interest for 2 years. Find his gain per year in this transaction.",
+    "options": ["$62.50", "$125.00", "$187.50", "$250.00"],
+    "correctAnswer": "$62.50",
+    "explanation": "Interest rate difference = 6.25% - 5% = 1.25% per year. Gain per year = 1.25% of $5000 = (1.25 * 5000) / 100 = $62.50."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "Ratio",
+    "difficulty": "Hard",
+    "question": "A vessel contains 60 liters of milk. 6 liters of milk is taken out and replaced with water. This process is repeated two more times. How many liters of milk are left in the vessel?",
+    "options": ["43.74 liters", "48.60 liters", "50.24 liters", "54.00 liters"],
+    "correctAnswer": "43.74 liters",
+    "explanation": "Formula: Remaining Milk = Initial * (1 - x/V)^n. Remaining = 60 * (1 - 6/60)^3 = 60 * (0.9)^3 = 60 * 0.729 = 43.74 liters."
+  },
+  {
+    "category": "Aptitude",
+    "topic": "Ages",
+    "difficulty": "Hard",
+    "question": "The product of the ages of Harish and Seema is 240. If twice the age of Seema is more than Harish's age by 4 years, what is Harish's age?",
+    "options": ["12 years", "16 years", "20 years", "24 years"],
+    "correctAnswer": "20 years",
+    "explanation": "Let Harish be H, Seema be S. H * S = 240. 2S - H = 4 => 2S = H + 4 => S = (H+4)/2. Substitute: H * (H+4)/2 = 240 => H^2 + 4H = 480 => H^2 + 4H - 480 = 0 => (H+24)(H-20) = 0 => H = 20."
+  },
+  {
+    "category": "Logical",
+    "topic": "Blood Relation",
+    "difficulty": "Easy",
+    "question": "Pointing to a photograph, a man said, 'I have no brother or sister but that man's father is my father's son.' Whose photograph was it?",
+    "options": ["His own", "His son's", "His father's", "His nephew's"],
+    "correctAnswer": "His son's",
+    "explanation": "Since the man has no brother or sister, 'my father's son' is himself. Thus, 'that man's father is myself'. Therefore, the photograph is of his son."
+  },
+  {
+    "category": "Logical",
+    "topic": "Blood Relation",
+    "difficulty": "Medium",
+    "question": "A is the mother of B and C. If D is the husband of C, what is A to D?",
+    "options": ["Mother-in-law", "Aunt", "Mother", "Sister-in-law"],
+    "correctAnswer": "Mother-in-law",
+    "explanation": "C is the child of A, and D is C's husband, which makes C the wife of D. A is therefore the mother-in-law of D."
+  },
+  {
+    "category": "Logical",
+    "topic": "Coding Decoding",
+    "difficulty": "Easy",
+    "question": "If in a certain language, SYSTEM is written as SYSMET and NEARER is written as AENRER, then how will FRACTION be written?",
+    "options": ["CARFTION", "CARFNOIT", "ARFCNOIT", "CARFTNOI"],
+    "correctAnswer": "CARFNOIT",
+    "explanation": "The word is split into two halves. First half: SYS becomes SYS (reversed is SYS). MET becomes MET (reversed is TEM). For FRACTION: first half FRAC reversed is CARF, second half TION reversed is NOIT. Combined: CARFNOIT."
+  },
+  {
+    "category": "Logical",
+    "topic": "Coding Decoding",
+    "difficulty": "Medium",
+    "question": "If Z = 52 and ACT = 48, then BAT will be equal to:",
+    "options": ["39", "40", "44", "46"],
+    "correctAnswer": "46",
+    "explanation": "Each alphabet position is doubled. A=1*2=2, C=3*2=6, T=20*2=40. Sum = 2+6+40=48. For BAT: B=2*2=4, A=1*2=2, T=20*2=40. Sum = 4+2+40=46."
+  },
+  {
+    "category": "Logical",
+    "topic": "Seating Arrangement",
+    "difficulty": "Easy",
+    "question": "Five boys A, B, C, D, and E are sitting in a row. A is to the right of B, E is to the left of B but to the right of C. A is to the left of D. Who is sitting in the middle?",
+    "options": ["A", "B", "D", "E"],
+    "correctAnswer": "B",
+    "explanation": "Order from left to right: E is left of B, C is left of E => C - E - B. A is right of B and left of D => B - A - D. Combined: C - E - B - A - D. Middle boy is B."
+  },
+  {
+    "category": "Logical",
+    "topic": "Seating Arrangement",
+    "difficulty": "Medium",
+    "question": "Six people P, Q, R, S, T, and U are sitting in a circle facing the center. P is opposite to Q, R is between P and S, T is between U and Q. If U is to the immediate left of P, who is sitting to the immediate right of Q?",
+    "options": ["R", "S", "T", "U"],
+    "correctAnswer": "S",
+    "explanation": "Clockwise sequence: P is opposite Q. U is left of P. T is between U and Q. R is between P and S. Order: P - R - S - Q - T - U (clockwise). Immediate right of Q is S."
+  },
+  {
+    "category": "Logical",
+    "topic": "Direction",
+    "difficulty": "Easy",
+    "question": "A man walks 5 km East, then turns right and walks 4 km. Finally, he turns left and walks 5 km. Which direction is he facing now?",
+    "options": ["East", "West", "North", "South"],
+    "correctAnswer": "East",
+    "explanation": "He starts facing East. Turning right makes him face South. Turning left from South makes him face East again."
+  },
+  {
+    "category": "Logical",
+    "topic": "Direction",
+    "difficulty": "Medium",
+    "question": "Ram starts from his house and walks 10 km South. Then he turns right and walks 6 km. Then he turns right again and walks 10 km. How far is he from his starting point?",
+    "options": ["6 km", "10 km", "16 km", "20 km"],
+    "correctAnswer": "6 km",
+    "explanation": "The walking path forms a rectangle. 10 km South, 6 km West, 10 km North. He ends up 6 km West of his starting point."
+  },
+  {
+    "category": "Logical",
+    "topic": "Series",
+    "difficulty": "Easy",
+    "question": "Find the missing term in the series: 3, 5, 9, 17, 33, ...",
+    "options": ["50", "60", "65", "80"],
+    "correctAnswer": "65",
+    "explanation": "Differences are powers of 2. 5-3=2, 9-5=4, 17-9=8, 33-17=16. Next difference is 32. 33 + 32 = 65."
+  },
+  {
+    "category": "Logical",
+    "topic": "Series",
+    "difficulty": "Medium",
+    "question": "Identify the missing number in the sequence: 2, 6, 12, 20, 30, 42, ...",
+    "options": ["52", "54", "56", "58"],
+    "correctAnswer": "56",
+    "explanation": "Differences are consecutive even numbers: +4, +6, +8, +10, +12. The next term increases by +14. 42 + 14 = 56. Alternatively, it is n^2 + n for n = 1, 2, 3... 7^2 + 7 = 56."
+  },
+  {
+    "category": "Logical",
+    "topic": "Puzzle",
+    "difficulty": "Easy",
+    "question": "In a race of 5 runners, John finished ahead of Sarah but behind Mike. Kevin finished ahead of Mike but behind Dave. Who won the race?",
+    "options": ["John", "Mike", "Kevin", "Dave"],
+    "correctAnswer": "Dave",
+    "explanation": "Order: Sarah < John < Mike. Mike < Kevin < Dave. Combining: Sarah < John < Mike < Kevin < Dave. Winner is Dave."
+  },
+  {
+    "category": "Logical",
+    "topic": "Puzzle",
+    "difficulty": "Medium",
+    "question": "Among five friends A, B, C, D, and E, A is taller than B but shorter than C. D is shorter than B but taller than E. Who is the shortest?",
+    "options": ["B", "C", "D", "E"],
+    "correctAnswer": "E",
+    "explanation": "Order by height: B < A < C. E < D < B. Combining: E < D < B < A < C. Shortest is E."
+  },
+  {
+    "category": "Logical",
+    "topic": "Syllogism",
+    "difficulty": "Easy",
+    "question": "Statements: All pens are books. All books are pencils. Conclusions: I. All pens are pencils. II. All pencils are pens.",
+    "options": ["Only conclusion I follows", "Only conclusion II follows", "Both I and II follow", "Neither I nor II follows"],
+    "correctAnswer": "Only conclusion I follows",
+    "explanation": "Pen is a subset of Book, and Book is a subset of Pencil. Hence, Pen is a subset of Pencil (All pens are pencils). Conclusion II is not necessarily true."
+  },
+  {
+    "category": "Logical",
+    "topic": "Syllogism",
+    "difficulty": "Medium",
+    "question": "Statements: Some keys are locks. Some locks are drawers. Conclusions: I. Some keys are drawers. II. No key is a drawer.",
+    "options": ["Only conclusion I follows", "Only conclusion II follows", "Either I or II follows", "Neither I nor II follows"],
+    "correctAnswer": "Either I or II follows",
+    "explanation": "This is a complementary pair (Some + No) between the same subjects (keys and drawers). One of them must be true. Hence, either I or II follows."
+  },
+  {
+    "category": "Logical",
+    "topic": "Analogy",
+    "difficulty": "Easy",
+    "question": "Doctor : Patient :: Politician : ?",
+    "options": ["Voter", "Minister", "Election", "Parliament"],
+    "correctAnswer": "Voter",
+    "explanation": "A doctor serves patients; a politician serves voters/constituents."
+  },
+  {
+    "category": "Logical",
+    "topic": "Analogy",
+    "difficulty": "Medium",
+    "question": "Clock : Time :: Thermometer : ?",
+    "options": ["Heat", "Radiation", "Temperature", "Energy"],
+    "correctAnswer": "Temperature",
+    "explanation": "A clock measures time; a thermometer measures temperature."
+  },
+  {
+    "category": "Logical",
+    "topic": "Blood Relation",
+    "difficulty": "Hard",
+    "question": "A's son B is married to C whose sister D is married to E, the brother of B. How is D related to A?",
+    "options": ["Daughter", "Daughter-in-law", "Sister-in-law", "Niece"],
+    "correctAnswer": "Daughter-in-law",
+    "explanation": "A's son is B, who is married to C. E is B's brother, making E also A's son. E is married to D, which makes D A's daughter-in-law."
+  },
+  {
+    "category": "Logical",
+    "topic": "Seating Arrangement",
+    "difficulty": "Hard",
+    "question": "Eight people A, B, C, D, E, F, G, and H are sitting around a circular table facing center. A is second to right of C who is third to right of H. D is second to left of F who is opposite G. G is adjacent to C. Who is sitting opposite H?",
+    "options": ["A", "B", "C", "D"],
+    "correctAnswer": "D",
+    "explanation": "C is 3rd to right of H. A is 2nd to right of C. G is adjacent to C, F is opposite G. D is 2nd to left of F. Solving this circular layout yields D sitting directly opposite H."
+  },
+  {
+    "category": "Logical",
+    "topic": "Puzzle",
+    "difficulty": "Hard",
+    "question": "Six books A, B, C, D, E, and F are placed side by side. B, C, E have blue covers, and others have red. A, B, D are new, others are old. A, C, D are law reports, others are directories. Which book is a new directory with a blue cover?",
+    "options": ["A", "B", "C", "D"],
+    "correctAnswer": "B",
+    "explanation": "Blue covers: B, C, E. New books: A, B, D. Directories: B, E, F. The only book common to all three lists is B."
+  },
+  {
+    "category": "Logical",
+    "topic": "Syllogism",
+    "difficulty": "Hard",
+    "question": "Statements: Only a few circles are squares. Some squares are triangles. No triangle is a hexagon. Conclusions: I. Some circles are not squares. II. Some squares are not hexagons.",
+    "options": ["Only conclusion I follows", "Only conclusion II follows", "Both I and II follow", "Neither I nor II follows"],
+    "correctAnswer": "Both I and II follow",
+    "explanation": "'Only a few circles are squares' implies some circles are squares and some circles are not squares. So I follows. 'Some squares are triangles' and 'No triangle is a hexagon' implies that the squares which are triangles cannot be hexagons. So II follows."
+  },
+  {
+    "category": "Verbal",
+    "topic": "Synonyms",
+    "difficulty": "Easy",
+    "question": "Choose the correct synonym of the word: ABANDON",
+    "options": ["Keep", "Forsake", "Adopt", "Cherish"],
+    "correctAnswer": "Forsake",
+    "explanation": "Abandon means to leave completely or desert. Forsake has the same meaning."
+  },
+  {
+    "category": "Verbal",
+    "topic": "Synonyms",
+    "difficulty": "Medium",
+    "question": "Choose the correct synonym of the word: GARRULOUS",
+    "options": ["Taciturn", "Reticent", "Loquacious", "Silent"],
+    "correctAnswer": "Loquacious",
+    "explanation": "Garrulous means excessively talkative. Loquacious is a direct synonym."
+  },
+  {
+    "category": "Verbal",
+    "topic": "Antonyms",
+    "difficulty": "Easy",
+    "question": "Choose the correct antonym of the word: FRUGAL",
+    "options": ["Thrifty", "Extravagant", "Miserly", "Economical"],
+    "correctAnswer": "Extravagant",
+    "explanation": "Frugal means sparing or economical with money or food. Extravagant is the opposite."
+  },
+  {
+    "category": "Verbal",
+    "topic": "Antonyms",
+    "difficulty": "Medium",
+    "question": "Choose the correct antonym of the word: EPHEMERAL",
+    "options": ["Transient", "Fleeting", "Eternal", "Brief"],
+    "correctAnswer": "Eternal",
+    "explanation": "Ephemeral means lasting for a very short time. Eternal means lasting forever, which is the antonym."
+  },
+  {
+    "category": "Verbal",
+    "topic": "Grammar",
+    "difficulty": "Easy",
+    "question": "Complete the sentence: Neither of the two candidates ________ qualified for the post.",
+    "options": ["is", "are", "were", "have"],
+    "correctAnswer": "is",
+    "explanation": "'Neither' is a singular pronoun and takes a singular verb. Therefore, 'is' is the correct verb."
+  },
+  {
+    "category": "Verbal",
+    "topic": "Grammar",
+    "difficulty": "Medium",
+    "question": "Choose the grammatically correct sentence:",
+    "options": [
+      "He has been working here since five years.",
+      "He has been working here for five years.",
+      "He is working here since five years.",
+      "He was working here for five years."
+    ],
+    "correctAnswer": "He has been working here for five years.",
+    "explanation": "'For' is used to denote a period of time (five years), whereas 'since' denotes a specific point in time. The present perfect continuous 'has been working' is correct."
+  },
+  {
+    "category": "Verbal",
+    "topic": "Reading",
+    "difficulty": "Easy",
+    "question": "According to a study, trees help reduce city noise by absorbing sound waves. Which of the following is true?",
+    "options": [
+      "Trees increase city noise.",
+      "Trees have no impact on city noise.",
+      "Trees help mitigate city noise.",
+      "Only tall trees absorb noise."
+    ],
+    "correctAnswer": "Trees help mitigate city noise.",
+    "explanation": "The text states trees help reduce city noise, which is synonymous with mitigating it."
+  },
+  {
+    "category": "Verbal",
+    "topic": "Reading",
+    "difficulty": "Medium",
+    "question": "Read the text: 'The industrial revolution accelerated urbanization as people migrated in search of factory jobs.' What is the primary cause of urbanization mentioned?",
+    "options": [
+      "Improvement in farming techniques.",
+      "Search for factory employment.",
+      "Desire for cultural exposure.",
+      "Government housing schemes."
+    ],
+    "correctAnswer": "Search for factory employment.",
+    "explanation": "The text explicitly links migrating to cities with 'in search of factory jobs'."
+  },
+  {
+    "category": "Verbal",
+    "topic": "Vocabulary",
+    "difficulty": "Easy",
+    "question": "Select the correct word to fill in the blank: The doctor gave him a ________ to relieve the pain.",
+    "options": ["prescription", "prescribe", "prescribed", "prescriptive"],
+    "correctAnswer": "prescription",
+    "explanation": "A noun is required after the article 'a'. 'Prescription' is the noun form."
+  },
+  {
+    "category": "Verbal",
+    "topic": "Vocabulary",
+    "difficulty": "Medium",
+    "question": "What is the meaning of the idiom 'To burn the midnight oil'?",
+    "options": [
+      "To waste resources.",
+      "To work late into the night.",
+      "To start a fire.",
+      "To sleep early."
+    ],
+    "correctAnswer": "To work late into the night.",
+    "explanation": "The idiom refers to reading or working late into the night, historically by the light of an oil lamp."
+  },
+  {
+    "category": "Verbal",
+    "topic": "Error Spotting",
+    "difficulty": "Easy",
+    "question": "Identify the error in: 'She is more taller than her sister.'",
+    "options": ["She is", "more taller", "than her", "sister"],
+    "correctAnswer": "more taller",
+    "explanation": "'Taller' is already a comparative adjective. Adding 'more' before it is redundant."
+  },
+  {
+    "category": "Verbal",
+    "topic": "Error Spotting",
+    "difficulty": "Medium",
+    "question": "Identify the error in: 'If I was you, I would accept the job offer.'",
+    "options": ["If I was", "you, I would", "accept the", "job offer"],
+    "correctAnswer": "If I was",
+    "explanation": "In hypothetical/subjunctive statements, 'were' should be used instead of 'was' regardless of pronoun number. The correct phrase is 'If I were you'."
+  },
+  {
+    "category": "Verbal",
+    "topic": "Sentence Completion",
+    "difficulty": "Easy",
+    "question": "Fill in the blank: Although she was tired, she ________ working.",
+    "options": ["continued", "stops", "has stopped", "refused"],
+    "correctAnswer": "continued",
+    "explanation": "'Although' shows a contrast. Despite being tired, she kept working. 'Continued' fits the past tense and the meaning."
+  },
+  {
+    "category": "Verbal",
+    "topic": "Sentence Completion",
+    "difficulty": "Medium",
+    "question": "Fill in the blank: The company's profits have plummeted, ________ forcing them to downsize.",
+    "options": ["thereby", "whereas", "although", "despite"],
+    "correctAnswer": "thereby",
+    "explanation": "'Thereby' means 'by that means' or 'as a result of that', which correctly connects the drop in profits with downsizing."
+  },
+  {
+    "category": "Verbal",
+    "topic": "Para Jumbles",
+    "difficulty": "Easy",
+    "question": "Rearrange sentences to form a coherent paragraph: A. He opened the door. B. John reached home. C. He walked inside. D. He took out his keys.",
+    "options": ["BDAC", "BADC", "DBAC", "ACDB"],
+    "correctAnswer": "BDAC",
+    "explanation": "Sequence: B (reached home) -> D (took out keys) -> A (opened door) -> C (walked inside). Thus, BDAC."
+  },
+  {
+    "category": "Verbal",
+    "topic": "Para Jumbles",
+    "difficulty": "Medium",
+    "question": "Arrange sentences: A. Finally, he drafted the report. B. He gathered all research data first. C. He analysed the statistics carefully. D. He was asked to write a survey.",
+    "options": ["DBCA", "DCBA", "BDCA", "BCDA"],
+    "correctAnswer": "DBCA",
+    "explanation": "Sequence: D (tasked with writing) -> B (gathered research first) -> C (analysed statistics) -> A (finally drafted report). Thus, DBCA."
+  },
+  {
+    "category": "Verbal",
+    "topic": "Synonyms",
+    "difficulty": "Hard",
+    "question": "Choose the synonym of: ALACRITY",
+    "options": ["Apathy", "Lethargy", "Eagerness", "Reluctance"],
+    "correctAnswer": "Eagerness",
+    "explanation": "Alacrity means brisk and cheerful readiness or eagerness."
+  },
+  {
+    "category": "Verbal",
+    "topic": "Antonyms",
+    "difficulty": "Hard",
+    "question": "Choose the antonym of: CACOPHONY",
+    "options": ["Harshness", "Discord", "Euphony", "Noise"],
+    "correctAnswer": "Euphony",
+    "explanation": "Cacophony refers to a harsh, discordant mixture of sounds. Euphony refers to sweet, pleasing sounds."
+  },
+  {
+    "category": "Verbal",
+    "topic": "Grammar",
+    "difficulty": "Hard",
+    "question": "Fill in: It is high time that we ________ against injustice.",
+    "options": ["act", "acted", "should act", "must act"],
+    "correctAnswer": "acted",
+    "explanation": "The phrase 'It is high time' is followed by a past simple subjunctive verb to indicate a present or future action that should have started already. Thus, 'acted' is correct."
+  },
+  {
+    "category": "Verbal",
+    "topic": "Error Spotting",
+    "difficulty": "Hard",
+    "question": "Identify the error in: 'Scarcely had he gone out than it began to rain heavily.'",
+    "options": ["Scarcely had he", "gone out", "than it", "began to rain"],
+    "correctAnswer": "than it",
+    "explanation": "'Scarcely' is paired with 'when' or 'before', not 'than'. The correct sentence is: 'Scarcely had he gone out when it began to rain...'"
+  },
+  {
+    "category": "Verbal",
+    "topic": "Sentence Completion",
+    "difficulty": "Hard",
+    "question": "Fill in: His arguments were so ________ that no one could counter them.",
+    "options": ["specious", "cogent", "redundant", "tenuous"],
+    "correctAnswer": "cogent",
+    "explanation": "'Cogent' means clear, logical, and convincing. If no one could counter them, the arguments must have been cogent."
+  },
+  {
+    "category": "Verbal",
+    "topic": "Para Jumbles",
+    "difficulty": "Hard",
+    "question": "Arrange: A. This mapping allows comparison. B. Scientists sequence DNA molecules. C. Next, they align these sequences. D. They look for mutations in genes.",
+    "options": ["BCAD", "BCDA", "CBAD", "BACD"],
+    "correctAnswer": "BCAD",
+    "explanation": "Sequence: B (sequence molecules) -> C (next, align them) -> A (this mapping allows comparison) -> D (look for mutations based on comparison). Thus, BCAD."
+  },
+  {
+    "category": "Technical",
+    "topic": "Computer Networks",
+    "difficulty": "Easy",
+    "question": "Which layer of the OSI model is responsible for routing packets across networks?",
+    "options": ["Data Link Layer", "Network Layer", "Transport Layer", "Session Layer"],
+    "correctAnswer": "Network Layer",
+    "explanation": "The Network Layer handles logical addressing, packet routing, and forwarding across networks."
+  },
+  {
+    "category": "Technical",
+    "topic": "Computer Networks",
+    "difficulty": "Medium",
+    "question": "What is the primary function of the Address Resolution Protocol (ARP)?",
+    "options": [
+      "To map domain names to IP addresses.",
+      "To map IP addresses to physical MAC addresses.",
+      "To route packets to the correct network gateway.",
+      "To establish secure handshake connections."
+    ],
+    "correctAnswer": "To map IP addresses to physical MAC addresses.",
+    "explanation": "ARP is used to resolve IPv4 addresses to physical MAC addresses within a local network."
+  },
+  {
+    "category": "Technical",
+    "topic": "Operating Systems",
+    "difficulty": "Easy",
+    "question": "Which CPU scheduling algorithm leads to starvation of longer processes?",
+    "options": [
+      "Round Robin",
+      "Shortest Job First (SJF) Non-Preemptive",
+      "First Come First Served (FCFS)",
+      "Priority-based / Shortest Remaining Time First"
+    ],
+    "correctAnswer": "Priority-based / Shortest Remaining Time First",
+    "explanation": "Shortest Remaining Time First (and SJF) continuously schedules shorter processes first, causing longer processes to starve."
+  },
+  {
+    "category": "Technical",
+    "topic": "Operating Systems",
+    "difficulty": "Medium",
+    "question": "What is a 'deadlock' in operating systems?",
+    "options": [
+      "A situation where a process crashes the CPU.",
+      "A situation where two or more processes are blocked waiting for resources held by each other.",
+      "A bug that leaks RAM memory indefinitely.",
+      "A filesystem corruption error."
+    ],
+    "correctAnswer": "A situation where two or more processes are blocked waiting for resources held by each other.",
+    "explanation": "Deadlock is a state where each process in a set is waiting for a resource that only another process in the set can release."
+  },
+  {
+    "category": "Technical",
+    "topic": "DBMS",
+    "difficulty": "Easy",
+    "question": "Which of the following properties ensures that all database transactions are either fully completed or not executed at all?",
+    "options": ["Atomicity", "Consistency", "Isolation", "Durability"],
+    "correctAnswer": "Atomicity",
+    "explanation": "Atomicity ensures that a transaction is treated as a single unit, which either succeeds entirely or fails completely (all-or-nothing)."
+  },
+  {
+    "category": "Technical",
+    "topic": "DBMS",
+    "difficulty": "Medium",
+    "question": "A table is in 2NF if it is in 1NF and has which of the following characteristics?",
+    "options": [
+      "No transitive dependencies.",
+      "No partial dependencies on candidate keys.",
+      "No multi-valued attributes.",
+      "Foreign key constraints on all tables."
+    ],
+    "correctAnswer": "No partial dependencies on candidate keys.",
+    "explanation": "Second Normal Form (2NF) requires that the table is in 1NF and no non-prime attribute is partially dependent on any candidate key."
+  },
+  {
+    "category": "Technical",
+    "topic": "OOPS",
+    "difficulty": "Easy",
+    "question": "What OOPS concept allows a subclass to provide a specific implementation of a method that is already defined in its superclass?",
+    "options": ["Method Overriding", "Method Overloading", "Encapsulation", "Abstraction"],
+    "correctAnswer": "Method Overriding",
+    "explanation": "Method overriding allows a child class to rewrite a method of its parent class to execute specialized code."
+  },
+  {
+    "category": "Technical",
+    "topic": "OOPS",
+    "difficulty": "Medium",
+    "question": "What is the primary difference between an interface and an abstract class?",
+    "options": [
+      "Abstract classes can have instance variables and concrete methods, whereas interfaces (prior to Java 8) can only have abstract methods.",
+      "Interfaces support multiple inheritance, whereas abstract classes do not.",
+      "Both a and b are correct.",
+      "There is no difference."
+    ],
+    "correctAnswer": "Both a and b are correct.",
+    "explanation": "In Java, a class can implement multiple interfaces but inherit only one class. Abstract classes can maintain state (instance variables) and define constructors, while interfaces represent pure contracts."
+  },
+  {
+    "category": "Technical",
+    "topic": "Java",
+    "difficulty": "Easy",
+    "question": "Which area of Java memory is used to store objects created via the 'new' keyword?",
+    "options": ["Stack Memory", "Heap Memory", "Method Area", "PC Register"],
+    "correctAnswer": "Heap Memory",
+    "explanation": "All objects in Java are dynamically allocated on the Heap Memory."
+  },
+  {
+    "category": "Technical",
+    "topic": "Java",
+    "difficulty": "Medium",
+    "question": "What will happen if we try to compile and run a class with multiple main methods in Java?",
+    "options": [
+      "Compilation error.",
+      "Runtime error.",
+      "It compiles and runs the main method with standard signature (String[] args). Others are treated as overloaded methods.",
+      "The program runs all main methods sequentially."
+    ],
+    "correctAnswer": "It compiles and runs the main method with standard signature (String[] args). Others are treated as overloaded methods.",
+    "explanation": "Java allows overloading the main method, but the JVM only invokes the standard 'public static void main(String[] args)' as the entry point."
+  },
+  {
+    "category": "Technical",
+    "topic": "Data Structures",
+    "difficulty": "Easy",
+    "question": "Which data structure follows the Last In First Out (LIFO) principle?",
+    "options": ["Queue", "Stack", "Linked List", "Binary Tree"],
+    "correctAnswer": "Stack",
+    "explanation": "A stack is a linear data structure that operates under the LIFO principle (elements added last are retrieved first)."
+  },
+  {
+    "category": "Technical",
+    "topic": "Data Structures",
+    "difficulty": "Medium",
+    "question": "What is the time complexity to search for an element in a balanced Binary Search Tree (BST)?",
+    "options": ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+    "correctAnswer": "O(log n)",
+    "explanation": "Searching in a balanced BST halves the search space at each step, resulting in a logarithmic O(log n) time complexity."
+  },
+  {
+    "category": "Technical",
+    "topic": "Algorithms",
+    "difficulty": "Easy",
+    "question": "Which sorting algorithm has a worst-case time complexity of O(n^2)?",
+    "options": ["Merge Sort", "Quick Sort", "Heap Sort", "All of the above"],
+    "correctAnswer": "Quick Sort",
+    "explanation": "Quick Sort has a worst-case time complexity of O(n^2) when the pivot divides the array unevenly (e.g. sorted arrays). Merge/Heap sorts are O(n log n) in worst cases."
+  },
+  {
+    "category": "Technical",
+    "topic": "Algorithms",
+    "difficulty": "Medium",
+    "question": "What algorithmic paradigm is used in binary search?",
+    "options": ["Dynamic Programming", "Greedy Method", "Divide and Conquer", "Backtracking"],
+    "correctAnswer": "Divide and Conquer",
+    "explanation": "Binary search divides the array into halves, conquers by searching the relevant half, and discards the other half."
+  },
+  {
+    "category": "Technical",
+    "topic": "Predict Output",
+    "difficulty": "Easy",
+    "question": "Predict the output of the JavaScript code: console.log(typeof NaN);",
+    "options": ["'NaN'", "'number'", "'undefined'", "'object'"],
+    "correctAnswer": "'number'",
+    "explanation": "In JavaScript, NaN (Not-a-Number) is classified as a numerical type, so typeof NaN evaluates to 'number'."
+  },
+  {
+    "category": "Technical",
+    "topic": "Predict Output",
+    "difficulty": "Medium",
+    "question": "Predict the output: int a = 5; int b = a++; System.out.println(b);",
+    "options": ["5", "6", "Compile Error", "Runtime Error"],
+    "correctAnswer": "5",
+    "explanation": "This is a post-increment operation. 'a++' returns the current value (5) first and assigns it to 'b', then increments 'a' to 6. Thus, 'b' is 5."
+  },
+  {
+    "category": "Technical",
+    "topic": "Code Debugging",
+    "difficulty": "Easy",
+    "question": "Which exception is thrown when code attempts to access a member of an object reference that is null?",
+    "options": [
+      "ArrayIndexOutOfBoundsException",
+      "NullPointerException",
+      "ClassCastException",
+      "IllegalArgumentException"
+    ],
+    "correctAnswer": "NullPointerException",
+    "explanation": "A NullPointerException is thrown when an application attempts to use null in a case where an object is required."
+  },
+  {
+    "category": "Technical",
+    "topic": "Code Debugging",
+    "difficulty": "Medium",
+    "question": "Debug this C code: for (int i = 0; i <= 5; i++); { printf('%d', i); } What is the bug?",
+    "options": [
+      "Syntax error on printf.",
+      "The loop will print 0 to 5.",
+      "Semicolon at the end of for-loop statement makes it an empty loop, printing only 6 once.",
+      "Infinite loop."
+    ],
+    "correctAnswer": "Semicolon at the end of for-loop statement makes it an empty loop, printing only 6 once.",
+    "explanation": "The semicolon terminates the for-statement. The block following it is executed once after the loop completes. By then, i has incremented to 6, so 6 is printed."
+  },
+  {
+    "category": "Technical",
+    "topic": "Pseudocode",
+    "difficulty": "Easy",
+    "question": "What is the result of the pseudocode: Set X = 10, Y = 20; Set X = X + Y; Set Y = X - Y; Set X = X - Y; Print X, Y;",
+    "options": ["10, 20", "20, 10", "30, 20", "30, 10"],
+    "correctAnswer": "20, 10",
+    "explanation": "X=30. Y = 30-20 = 10. X = 30-10 = 20. This is a classic arithmetic swap without a third variable. Output is 20, 10."
+  },
+  {
+    "category": "Technical",
+    "topic": "Pseudocode",
+    "difficulty": "Medium",
+    "question": "Pseudocode: Function solve(n) { if (n <= 1) return 1; return n * solve(n - 1); } What does solve(5) evaluate to?",
+    "options": ["15", "24", "120", "720"],
+    "correctAnswer": "120",
+    "explanation": "This pseudocode defines a recursive factorial function. 5! = 5 * 4 * 3 * 2 * 1 = 120."
+  },
+  {
+    "category": "Technical",
+    "topic": "Computer Networks",
+    "difficulty": "Hard",
+    "question": "Which of the following is true regarding Classless Inter-Domain Routing (CIDR) subnet mask /26?",
+    "options": [
+      "It offers 64 total IP addresses, with 62 usable hosts.",
+      "It offers 32 total IP addresses, with 30 usable hosts.",
+      "It offers 128 total IP addresses, with 126 usable hosts.",
+      "It represents subnet mask 255.255.255.224."
+    ],
+    "correctAnswer": "It offers 64 total IP addresses, with 62 usable hosts.",
+    "explanation": "A /26 mask leaves 32 - 26 = 6 host bits. 2^6 = 64 IP addresses. Excluding the network ID and broadcast address, there are 64 - 2 = 62 usable hosts. Subnet mask is 255.255.255.192."
+  },
+  {
+    "category": "Technical",
+    "topic": "Operating Systems",
+    "difficulty": "Hard",
+    "question": "In virtual memory paging, if the page table size is 2^10 entries and page size is 4KB, how many bits are required for the logical address space?",
+    "options": ["20 bits", "22 bits", "24 bits", "32 bits"],
+    "correctAnswer": "22 bits",
+    "explanation": "Page size is 4KB = 2^12 bytes, requiring 12 offset bits. Page table has 2^10 entries, requiring 10 page number bits. Total logical address bits = page number bits + offset bits = 10 + 12 = 22 bits."
+  },
+  {
+    "category": "Technical",
+    "topic": "DBMS",
+    "difficulty": "Hard",
+    "question": "What conflict serializability algorithm condition determines if a history is conflict serializable?",
+    "options": [
+      "The precedence (dependency) graph has no cycles.",
+      "The read-write operations occur in alphabetical order.",
+      "All transactions commit concurrently.",
+      "The transaction uses two-phase locking exclusively."
+    ],
+    "correctAnswer": "The precedence (dependency) graph has no cycles.",
+    "explanation": "A schedule S is conflict serializable if and only if its precedence graph contains no directed cycles."
+  },
+  {
+    "category": "Technical",
+    "topic": "Data Structures",
+    "difficulty": "Hard",
+    "question": "What is the worst-case time complexity of inserting an element into an AVL Tree?",
+    "options": ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+    "correctAnswer": "O(log n)",
+    "explanation": "An AVL tree is a self-balancing binary search tree. Both insertion and re-balancing rotations take logarithmic time O(log n)."
+  },
+  {
+    "category": "Technical",
+    "topic": "Algorithms",
+    "difficulty": "Hard",
+    "question": "Which algorithm finds the shortest path from a single source node to all other nodes in a graph that may contain negative edge weights?",
+    "options": [
+      "Dijkstra's Algorithm",
+      "Bellman-Ford Algorithm",
+      "Kruskal's Algorithm",
+      "Floyd-Warshall Algorithm"
+    ],
+    "correctAnswer": "Bellman-Ford Algorithm",
+    "explanation": "Dijkstra's algorithm fails with negative edge weights. Bellman-Ford computes single-source shortest paths on graphs with negative weights (and detects negative cycles) in O(V*E) time."
+  },
+  {
+    "category": "Technical",
+    "topic": "Predict Output",
+    "difficulty": "Hard",
+    "question": "Predict the output of the Java statement: System.out.println(10 + 20 + 'Java' + 10 + 20);",
+    "options": [
+      "30Java1020",
+      "Java301020",
+      "1020Java1020",
+      "30Java30"
+    ],
+    "correctAnswer": "30Java1020",
+    "explanation": "Java evaluates from left to right. 10 + 20 = 30 (integer addition). Then 30 + 'Java' = '30Java' (string concatenation). Then '30Java' + 10 = '30Java10' (concatenation) + 20 = '30Java1020' (concatenation)."
+  },
+  {
+    "category": "Technical",
+    "topic": "JavaScript",
+    "difficulty": "Easy",
+    "question": "Which keyword is used to declare block-scoped variables in modern ES6 JavaScript?",
+    "options": ["var", "let", "global", "def"],
+    "correctAnswer": "let",
+    "explanation": "In ES6 JavaScript, 'let' and 'const' provide block scoping, whereas 'var' provides function scoping."
+  },
+  {
+    "category": "Technical",
+    "topic": "JavaScript",
+    "difficulty": "Medium",
+    "question": "What will `console.log(1 + '2' + 3)` output in JavaScript?",
+    "options": ["6", "'123'", "'6'", "NaN"],
+    "correctAnswer": "'123'",
+    "explanation": "In JavaScript, 1 + '2' triggers string concatenation resulting in '12', and '12' + 3 further concatenates to '123'."
+  },
+  {
+    "category": "Technical",
+    "topic": "JavaScript",
+    "difficulty": "Hard",
+    "question": "Which of the following best defines a JavaScript closure?",
+    "options": [
+      "A function that returns boolean values exclusively.",
+      "A function bundled together with references to its surrounding lexical environment.",
+      "A method that locks object properties from being mutated.",
+      "An asynchronous event listener wrapper."
+    ],
+    "correctAnswer": "A function bundled together with references to its surrounding lexical environment.",
+    "explanation": "A closure gives an inner function access to an outer function's scope variables even after the outer function has closed."
+  },
+  {
+    "category": "Technical",
+    "topic": "AngularJS",
+    "difficulty": "Easy",
+    "question": "Which directive in AngularJS achieves two-way data binding between input elements and scope variables?",
+    "options": ["ng-bind", "ng-model", "ng-repeat", "ng-app"],
+    "correctAnswer": "ng-model",
+    "explanation": "The 'ng-model' directive binds the value of HTML controls (input, select, textarea) to application scope data in AngularJS."
+  },
+  {
+    "category": "Technical",
+    "topic": "AngularJS",
+    "difficulty": "Medium",
+    "question": "Which core AngularJS service is used to send asynchronous HTTP requests to external servers?",
+    "options": ["$http", "$request", "$fetch", "$ajax"],
+    "correctAnswer": "$http",
+    "explanation": "The AngularJS $http service facilitates communication with remote HTTP servers via XMLHttpRequest or JSONP."
+  },
+  {
+    "category": "Technical",
+    "topic": "AngularJS",
+    "difficulty": "Hard",
+    "question": "What is the primary function of `$scope.$apply()` in AngularJS?",
+    "options": [
+      "To inject new dependencies into a controller.",
+      "To trigger the digest cycle for updating scope bindings when events occur outside Angular context.",
+      "To compile template DOM trees into executable link functions.",
+      "To destroy unused directive instances."
+    ],
+    "correctAnswer": "To trigger the digest cycle for updating scope bindings when events occur outside Angular context.",
+    "explanation": "$scope.$apply() explicitly enters the Angular digest loop so that model mutations triggered by third-party DOM events or timers refresh view bindings."
+  },
+  {
+    "category": "Technical",
+    "topic": "Node.js",
+    "difficulty": "Easy",
+    "question": "Which built-in Node.js module provides utilities for working with file and directory paths?",
+    "options": ["fs", "path", "http", "url"],
+    "correctAnswer": "path",
+    "explanation": "The Node.js 'path' module provides utilities for joining, resolving, and manipulating file and directory paths across different OS platforms."
+  },
+  {
+    "category": "Technical",
+    "topic": "Node.js",
+    "difficulty": "Medium",
+    "question": "What architecture enables Node.js to handle thousands of concurrent requests asynchronously on a single thread?",
+    "options": ["Multi-threading Process Pool", "Event Loop and Non-blocking I/O", "Synchronous Blocking Threads", "Apache Worker MPM"],
+    "correctAnswer": "Event Loop and Non-blocking I/O",
+    "explanation": "Node.js uses a single-threaded Event Loop combined with non-blocking I/O operations provided by libuv to handle high concurrency efficiently."
+  },
+  {
+    "category": "Technical",
+    "topic": "Node.js",
+    "difficulty": "Hard",
+    "question": "Which method in the Node.js `child_process` module spawns a shell to execute a command and buffers the output?",
+    "options": ["child_process.fork()", "child_process.exec()", "child_process.spawn()", "child_process.run()"],
+    "correctAnswer": "child_process.exec()",
+    "explanation": "child_process.exec() spawns a shell (e.g. /bin/sh or cmd.exe) to execute a command string and passes the buffered output to a callback."
+  },
+  {
+    "category": "Technical",
+    "topic": "Express.js",
+    "difficulty": "Easy",
+    "question": "In Express.js, which method registers a middleware function that runs for all incoming HTTP requests?",
+    "options": ["app.all()", "app.use()", "app.get()", "app.listen()"],
+    "correctAnswer": "app.use()",
+    "explanation": "app.use() mounts specified middleware functions at the path specified (or globally if no path is given)."
+  },
+  {
+    "category": "Technical",
+    "topic": "Express.js",
+    "difficulty": "Medium",
+    "question": "What parameters must an Express.js error-handling middleware function accept?",
+    "options": ["(req, res)", "(err, req, res)", "(err, req, res, next)", "(req, res, next, status)"],
+    "correctAnswer": "(err, req, res, next)",
+    "explanation": "Express.js recognizes middleware as error handlers only when they declare exactly 4 arguments: (err, req, res, next)."
+  },
+  {
+    "category": "Technical",
+    "topic": "Express.js",
+    "difficulty": "Hard",
+    "question": "Which built-in Express middleware parses incoming requests with JSON payloads?",
+    "options": ["express.urlencoded()", "express.json()", "bodyParser.raw()", "express.static()"],
+    "correctAnswer": "express.json()",
+    "explanation": "express.json() is a built-in middleware function in Express based on body-parser to parse incoming JSON request bodies."
+  },
+  {
+    "category": "Technical",
+    "topic": "MongoDB",
+    "difficulty": "Easy",
+    "question": "What binary data format does MongoDB use to store document data internally?",
+    "options": ["JSON", "XML", "BSON", "Protocol Buffers"],
+    "correctAnswer": "BSON",
+    "explanation": "MongoDB stores data records as BSON (Binary JSON) documents, extending JSON to support data types like Date and Binary."
+  },
+  {
+    "category": "Technical",
+    "topic": "MongoDB",
+    "difficulty": "Medium",
+    "question": "Which MongoDB collection method retrieves all documents matching a specified query filter?",
+    "options": ["db.collection.select()", "db.collection.find()", "db.collection.get()", "db.collection.fetch()"],
+    "correctAnswer": "db.collection.find()",
+    "explanation": "The db.collection.find() method selects documents in a collection and returns a cursor to the matching documents."
+  },
+  {
+    "category": "Technical",
+    "topic": "MongoDB",
+    "difficulty": "Hard",
+    "question": "Which MongoDB aggregation pipeline stage performs an equality join to another collection in the same database?",
+    "options": ["$project", "$match", "$lookup", "$group"],
+    "correctAnswer": "$lookup",
+    "explanation": "$lookup performs a left outer join to an unsharded collection in the same database to filter in documents from the joined collection for processing."
+  },
+  {
+    "category": "Technical",
+    "topic": "HTML & CSS",
+    "difficulty": "Easy",
+    "question": "Which HTML element specifies a header for a document or section, and which CSS property sets element font size?",
+    "options": ["<header> and font-size", "<head> and text-size", "<top> and font-weight", "<section> and text-style"],
+    "correctAnswer": "<header> and font-size",
+    "explanation": "The <header> HTML tag defines introductory content, and the CSS 'font-size' property controls text scale."
+  },
+  {
+    "category": "Technical",
+    "topic": "HTML & CSS",
+    "difficulty": "Medium",
+    "question": "In the CSS Box Model, which layer creates space outside an element's border?",
+    "options": ["Padding", "Margin", "Content", "Outline"],
+    "correctAnswer": "Margin",
+    "explanation": "Margin clears an area outside the border of an element, creating spacing between adjacent DOM nodes."
+  },
+  {
+    "category": "Technical",
+    "topic": "HTML & CSS",
+    "difficulty": "Hard",
+    "question": "What is the effect of applying `box-sizing: border-box;` in CSS styling?",
+    "options": [
+      "It adds an additional outer margin equal to the border width.",
+      "It includes padding and border in the element's total specified width and height.",
+      "It hides overflow content beyond the element's border.",
+      "It forces the element to take the full width of the parent container."
+    ],
+    "correctAnswer": "It includes padding and border in the element's total specified width and height.",
+    "explanation": "With `box-sizing: border-box;`, padding and border are included in the specified width/height calculations, preventing layout shifts."
+  }
+]
