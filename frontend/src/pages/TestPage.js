@@ -53,7 +53,8 @@ const TestPage = () => {
         }
       } catch (err) {
         console.error('Error starting test:', err);
-        alert('Failed to start test. Please check database configuration or try again.');
+        const message = err.response?.data?.message || 'Failed to start test. Please check database configuration or try again.';
+        alert(message);
         navigate('/');
       } finally {
         setLoading(false);
