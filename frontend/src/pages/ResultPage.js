@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title } from 'chart.js';
 import { Pie, Bar } from 'react-chartjs-2';
 import SkeletonLoader from '../components/SkeletonLoader';
+import FormattedQuestion from '../components/FormattedQuestion';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title);
 
@@ -318,7 +319,9 @@ const ResultPage = () => {
                     <span className="text-muted small ms-auto fw-bold">{q.topic}</span>
                   </div>
 
-                  <h5 className="fw-semibold mb-3">{q.question}</h5>
+                  <div className="fw-semibold mb-3">
+                    <FormattedQuestion text={q.question} />
+                  </div>
 
                   {/* Options List */}
                   <div className="row g-2 mb-3">
@@ -340,7 +343,9 @@ const ResultPage = () => {
                       return (
                         <div key={oIdx} className="col-12">
                           <div className={`p-2.5 px-3 rounded d-flex align-items-center ${optClass}`}>
-                            <span className="small">{opt}</span>
+                            <span className="small">
+                              <FormattedQuestion text={opt} isOption={true} />
+                            </span>
                             {badge}
                           </div>
                         </div>

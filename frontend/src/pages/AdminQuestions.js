@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import SkeletonLoader from '../components/SkeletonLoader';
+import FormattedQuestion from '../components/FormattedQuestion';
+import { SAMPLE_QUESTIONS_BY_CATEGORY, downloadSampleJSON } from '../utils/sampleQuestionsData';
 
 const AdminQuestions = () => {
   const [questions, setQuestions] = useState([]);
@@ -8,6 +10,7 @@ const AdminQuestions = () => {
   const [topics, setTopics] = useState([]);
   const [pagination, setPagination] = useState({});
   const [loading, setLoading] = useState(true);
+  const [sampleCategory, setSampleCategory] = useState('Technical');
 
   // Filters state
   const [search, setSearch] = useState('');
@@ -168,57 +171,18 @@ const AdminQuestions = () => {
     setSelectedFile(e.target.files[0]);
   };
 
-  const handleDownloadSampleJSON = () => {
-    const sampleData = [
-      {
-        category: 'Technical',
-        topic: 'Data Structures',
-        difficulty: 'Easy',
-        question: 'Which data structure operates on a LIFO (Last In First Out) basis?',
-        options: ['Queue', 'Stack', 'Array', 'Linked List'],
-        correctAnswer: 'Stack',
-        explanation: 'A Stack works on the Last In First Out (LIFO) principle, where the last element added is removed first.',
-      },
-      {
-        category: 'Aptitude',
-        topic: 'Percentages',
-        difficulty: 'Medium',
-        question: 'What is 20% of 150?',
-        options: ['25', '30', '35', '40'],
-        correctAnswer: '30',
-        explanation: '20% of 150 = (20 / 100) * 150 = 30.',
-      },
-    ];
-
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(sampleData, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', 'sample_questions.json');
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
+  const handleDownloadSampleJSON = (category = sampleCategory) => {
+    downloadSampleJSON(category);
+    const count = SAMPLE_QUESTIONS_BY_CATEGORY[category]?.length || 0;
+    setToastMessage(`Downloaded ${category} sample JSON containing all ${count} topics!`);
+    setTimeout(() => setToastMessage(''), 4000);
   };
 
   const handleCopyJSONSample = () => {
-    const sampleText = `[
-  {
-    "category": "Technical",
-    "topic": "Data Structures",
-    "difficulty": "Easy",
-    "question": "Which data structure operates on a LIFO (Last In First Out) basis?",
-    "options": [
-      "Queue",
-      "Stack",
-      "Array",
-      "Linked List"
-    ],
-    "correctAnswer": "Stack",
-    "explanation": "A Stack works on the Last In First Out (LIFO) principle."
-  }
-]`;
-    navigator.clipboard.writeText(sampleText);
-    setToastMessage('Sample JSON copied to clipboard!');
-    setTimeout(() => setToastMessage(''), 3000);
+    const sampleData = SAMPLE_QUESTIONS_BY_CATEGORY[sampleCategory] || SAMPLE_QUESTIONS_BY_CATEGORY['Technical'];
+    navigator.clipboard.writeText(JSON.stringify(sampleData, null, 2));
+    setToastMessage(`Copied ${sampleCategory} sample JSON (${sampleData.length} topics) to clipboard!`);
+    setTimeout(() => setToastMessage(''), 4000);
   };
 
   const handleJSONUpload = async (e) => {
@@ -296,7 +260,7 @@ const AdminQuestions = () => {
         {/* Bulk Upload Widget */}
         <div className="col-12 col-lg-5">
           <div className="card glass-card border p-4 h-100 d-flex flex-column" style={{ borderColor: 'var(--border-color)' }}>
-            <div className="d-flex justify-content-between align-items-center mb-3">
+            <div className="d-flex justify-content-between align-items-center mb-2">
               <h5 className="fw-bold mb-0">Bulk Import JSON</h5>
               <button
                 type="button"
@@ -308,7 +272,43 @@ const AdminQuestions = () => {
                 JSON Format Guide
               </button>
             </div>
-            <p className="text-muted small">Upload a <code>.json</code> file containing an array of questions. Click <strong>JSON Format Guide</strong> to download a ready-made sample template.</p>
+            <p className="text-muted small mb-3">Upload a <code>.json</code> file to import questions. Select a category below to download a reference sample containing <strong>all topics</strong>.</p>
+            
+            {/* Category selection for sample template download */}
+            <div className="p-3 rounded-3 border mb-3" style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-color)' }}>
+              <div className="d-flex justify-content-between align-items-center mb-1.5">
+                <label className="form-label small fw-bold mb-0 text-muted">
+                  <i className="bi bi-collection me-1 text-primary"></i> Sample JSON Category:
+                </label>
+                <span className="badge bg-primary-subtle text-primary border small">
+                  {SAMPLE_QUESTIONS_BY_CATEGORY[sampleCategory]?.length} Topics Included
+                </span>
+              </div>
+              <div className="input-group input-group-sm">
+                <select
+                  className="form-select form-select-sm fw-medium"
+                  value={sampleCategory}
+                  onChange={(e) => setSampleCategory(e.target.value)}
+                  style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)', borderColor: 'var(--border-color)' }}
+                >
+                  <option value="Technical">Technical (All 16 Topics)</option>
+                  <option value="Aptitude">Aptitude (All 12 Topics)</option>
+                  <option value="Logical">Logical (All 8 Topics)</option>
+                  <option value="Verbal">Verbal (All 8 Topics)</option>
+                  <option value="All Categories">All Categories (All 44 Topics)</option>
+                </select>
+                <button
+                  type="button"
+                  className="btn btn-primary-custom btn-sm px-3"
+                  onClick={() => handleDownloadSampleJSON(sampleCategory)}
+                  title={`Download sample_${sampleCategory.toLowerCase().replace(/\s+/g, '_')}.json with all topics`}
+                >
+                  <i className="bi bi-download me-1"></i>
+                  Download
+                </button>
+              </div>
+            </div>
+
             <form onSubmit={handleJSONUpload} className="mt-auto">
               <div className="mb-3">
                 <input
@@ -319,34 +319,23 @@ const AdminQuestions = () => {
                   onChange={handleFileChange}
                 />
               </div>
-              <div className="d-flex gap-2">
-                <button
-                  type="submit"
-                  className="btn btn-primary-custom btn-sm px-4 flex-grow-1"
-                  disabled={uploading || !selectedFile}
-                >
-                  {uploading ? (
-                    <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                      Importing...
-                    </>
-                  ) : (
-                    <>
-                      <i className="bi bi-upload me-1"></i>
-                      Upload JSON
-                    </>
-                  )}
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-outline-secondary btn-sm"
-                  onClick={handleDownloadSampleJSON}
-                  title="Download sample_questions.json template"
-                >
-                  <i className="bi bi-download me-1"></i>
-                  Sample JSON
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="btn btn-primary-custom btn-sm w-100 py-2 fw-semibold"
+                disabled={uploading || !selectedFile}
+              >
+                {uploading ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                    Importing Questions...
+                  </>
+                ) : (
+                  <>
+                    <i className="bi bi-upload me-1"></i>
+                    Upload Questions JSON
+                  </>
+                )}
+              </button>
             </form>
           </div>
         </div>
@@ -594,16 +583,28 @@ const AdminQuestions = () => {
 
                   {/* Question */}
                   <div className="col-12">
-                    <label className="form-label small fw-semibold">Question Text</label>
+                    <label className="form-label small fw-semibold d-flex justify-content-between">
+                      <span>Question Text (Supports Markdown Code Blocks & Indented Pseudocode)</span>
+                      <span className="text-muted small">Use <code>```lang</code> or standard indents</span>
+                    </label>
                     <textarea
                       className="form-control"
-                      rows="3"
-                      placeholder="Type the question content..."
+                      rows="4"
+                      placeholder="Type question content or paste code/pseudocode with indentation..."
                       name="question"
                       value={formData.question}
                       onChange={handleInputChange}
+                      style={{ fontFamily: "'Fira Code', Consolas, Monaco, monospace", fontSize: '0.88rem' }}
                       required
                     ></textarea>
+                    {formData.question && (formData.question.includes('\n') || formData.question.includes('`')) && (
+                      <div className="mt-2 p-2.5 rounded-3 border" style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-color)' }}>
+                        <span className="small text-muted fw-bold d-block mb-1">
+                          <i className="bi bi-eye me-1"></i> Live Code & Indentation Preview:
+                        </span>
+                        <FormattedQuestion text={formData.question} />
+                      </div>
+                    )}
                   </div>
 
                   {/* Options (A to D) */}
@@ -784,49 +785,60 @@ const AdminQuestions = () => {
                 </table>
               </div>
 
+              {/* Category Selector Tabs inside Modal */}
+              <div className="mb-3 p-3 rounded-3 border" style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-color)' }}>
+                <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                  <span className="small fw-bold text-muted">
+                    <i className="bi bi-funnel me-1 text-primary"></i>
+                    Select Category to Preview & Download:
+                  </span>
+                  <span className="badge bg-primary-subtle text-primary border small">
+                    {SAMPLE_QUESTIONS_BY_CATEGORY[sampleCategory]?.length} Topics Covered
+                  </span>
+                </div>
+                <div className="btn-group btn-group-sm w-100 flex-wrap" role="group">
+                  {['Technical', 'Aptitude', 'Logical', 'Verbal', 'All Categories'].map((cat) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      className={`btn ${sampleCategory === cat ? 'btn-primary-custom' : 'btn-outline-secondary'}`}
+                      onClick={() => setSampleCategory(cat)}
+                      style={{ fontSize: '0.8rem' }}
+                    >
+                      {cat} ({SAMPLE_QUESTIONS_BY_CATEGORY[cat]?.length})
+                    </button>
+                  ))}
+                </div>
+
+                {/* Topics Badges */}
+                <div className="mt-2.5 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
+                  <span className="small text-muted fw-semibold d-block mb-1.5">
+                    Topics included in this {sampleCategory} sample ({SAMPLE_QUESTIONS_BY_CATEGORY[sampleCategory]?.length}):
+                  </span>
+                  <div className="d-flex flex-wrap gap-1">
+                    {SAMPLE_QUESTIONS_BY_CATEGORY[sampleCategory]?.map((q, idx) => (
+                      <span key={idx} className="badge bg-secondary-subtle text-secondary border small">
+                        {q.topic}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
               <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
-                <h6 className="fw-bold mb-0">2. Valid JSON Code Example</h6>
+                <h6 className="fw-bold mb-0">2. Valid JSON Code Example ({sampleCategory})</h6>
                 <div className="d-flex gap-2">
                   <button className="btn btn-sm btn-outline-secondary" onClick={handleCopyJSONSample}>
                     <i className="bi bi-clipboard me-1"></i> Copy Sample JSON
                   </button>
-                  <button className="btn btn-sm btn-primary-custom" onClick={handleDownloadSampleJSON}>
-                    <i className="bi bi-download me-1"></i> Download sample_questions.json
+                  <button className="btn btn-sm btn-primary-custom" onClick={() => handleDownloadSampleJSON(sampleCategory)}>
+                    <i className="bi bi-download me-1"></i> Download sample_{sampleCategory.toLowerCase().replace(/\s+/g, '_')}.json
                   </button>
                 </div>
               </div>
 
-              <pre className="p-3 rounded-3 border text-start small mb-0" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)', overflowX: 'auto', maxHeight: '250px' }}>
-{`[
-  {
-    "category": "Technical",
-    "topic": "Data Structures",
-    "difficulty": "Easy",
-    "question": "Which data structure operates on a LIFO (Last In First Out) basis?",
-    "options": [
-      "Queue",
-      "Stack",
-      "Array",
-      "Linked List"
-    ],
-    "correctAnswer": "Stack",
-    "explanation": "A Stack works on the Last In First Out (LIFO) principle."
-  },
-  {
-    "category": "Aptitude",
-    "topic": "Percentages",
-    "difficulty": "Medium",
-    "question": "What is 20% of 150?",
-    "options": [
-      "25",
-      "30",
-      "35",
-      "40"
-    ],
-    "correctAnswer": "30",
-    "explanation": "20% of 150 = (20 / 100) * 150 = 30."
-  }
-]`}
+              <pre className="p-3 rounded-3 border text-start small mb-0" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)', overflowX: 'auto', maxHeight: '280px' }}>
+                {JSON.stringify(SAMPLE_QUESTIONS_BY_CATEGORY[sampleCategory] || [], null, 2)}
               </pre>
             </div>
             <div className="modal-footer border-top" style={{ borderColor: 'var(--border-color)' }}>

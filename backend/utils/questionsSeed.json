@@ -836,10 +836,10 @@
     "category": "Technical",
     "topic": "Predict Output",
     "difficulty": "Medium",
-    "question": "Predict the output: int a = 5; int b = a++; System.out.println(b);",
-    "options": ["5", "6", "Compile Error", "Runtime Error"],
-    "correctAnswer": "5",
-    "explanation": "This is a post-increment operation. 'a++' returns the current value (5) first and assigns it to 'b', then increments 'a' to 6. Thus, 'b' is 5."
+    "question": "Predict the output of the following Java code:\n\nint a = 5;\nint b = a++;\nSystem.out.println(\"a=\" + a + \", b=\" + b);",
+    "options": ["a=6, b=5", "a=5, b=5", "a=6, b=6", "a=5, b=6"],
+    "correctAnswer": "a=6, b=5",
+    "explanation": "In post-increment (a++), the current value 5 is assigned to b first, and then a is incremented to 6."
   },
   {
     "category": "Technical",
@@ -859,12 +859,12 @@
     "category": "Technical",
     "topic": "Code Debugging",
     "difficulty": "Medium",
-    "question": "Debug this C code: for (int i = 0; i <= 5; i++); { printf('%d', i); } What is the bug?",
+    "question": "Debug this C code snippet:\n\nfor (int i = 0; i <= 5; i++);\n{\n    printf(\"%d \", i);\n}\n\nWhat is the bug?",
     "options": [
-      "Syntax error on printf.",
-      "The loop will print 0 to 5.",
       "Semicolon at the end of for-loop statement makes it an empty loop, printing only 6 once.",
-      "Infinite loop."
+      "The loop will print 0 to 5.",
+      "Infinite loop error.",
+      "Syntax error on printf."
     ],
     "correctAnswer": "Semicolon at the end of for-loop statement makes it an empty loop, printing only 6 once.",
     "explanation": "The semicolon terminates the for-statement. The block following it is executed once after the loop completes. By then, i has incremented to 6, so 6 is printed."
@@ -873,7 +873,7 @@
     "category": "Technical",
     "topic": "Pseudocode",
     "difficulty": "Easy",
-    "question": "What is the result of the pseudocode: Set X = 10, Y = 20; Set X = X + Y; Set Y = X - Y; Set X = X - Y; Print X, Y;",
+    "question": "What is the result of the following pseudocode?\n\nSet X = 10, Y = 20;\nSet X = X + Y;\nSet Y = X - Y;\nSet X = X - Y;\nPrint X, Y;",
     "options": ["10, 20", "20, 10", "30, 20", "30, 10"],
     "correctAnswer": "20, 10",
     "explanation": "X=30. Y = 30-20 = 10. X = 30-10 = 20. This is a classic arithmetic swap without a third variable. Output is 20, 10."
@@ -882,7 +882,7 @@
     "category": "Technical",
     "topic": "Pseudocode",
     "difficulty": "Medium",
-    "question": "Pseudocode: Function solve(n) { if (n <= 1) return 1; return n * solve(n - 1); } What does solve(5) evaluate to?",
+    "question": "Consider the following recursive pseudocode:\n\nFunction solve(n):\n    if (n <= 1):\n        return 1\n    return n * solve(n - 1)\n\nWhat does solve(5) evaluate to?",
     "options": ["15", "24", "120", "720"],
     "correctAnswer": "120",
     "explanation": "This pseudocode defines a recursive factorial function. 5! = 5 * 4 * 3 * 2 * 1 = 120."

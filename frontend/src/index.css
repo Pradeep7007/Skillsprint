@@ -448,3 +448,82 @@ input, select, textarea {
   height: 35px;
   font-size: 0.8rem;
 }
+
+/* =========================================================
+   CODE & PSEUDOCODE FORMATTING STYLES
+   ========================================================= */
+
+.code-snippet-box {
+  background-color: #0b1120 !important;
+  color: #e2e8f0 !important;
+  border: 1px solid #1e293b !important;
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+}
+
+[data-theme='light'] .code-snippet-box {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border: 1px solid #334155 !important;
+}
+
+.code-snippet-header {
+  background-color: rgba(15, 23, 42, 0.95);
+  border-bottom: 1px solid #1e293b !important;
+  font-size: 0.775rem;
+}
+
+.code-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.code-dot.red { background-color: #ef4444; }
+.code-dot.yellow { background-color: #f59e0b; }
+.code-dot.green { background-color: #10b981; }
+
+.code-lang-label {
+  color: #94a3b8;
+  font-size: 0.725rem;
+  letter-spacing: 0.06em;
+}
+
+.code-snippet-pre {
+  white-space: pre !important;
+  tab-size: 4 !important;
+  -moz-tab-size: 4 !important;
+  font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace !important;
+  font-size: 0.915rem;
+  line-height: 1.6;
+  color: #e2e8f0;
+}
+
+.code-line {
+  min-height: 1.5em;
+}
+
+.code-line-number {
+  user-select: none;
+  color: #475569;
+  font-size: 0.8rem;
+  min-width: 2.25rem;
+  font-family: 'Consolas', 'Monaco', monospace;
+}
+
+.code-line-text {
+  white-space: pre;
+  tab-size: 4;
+}
+
+.inline-code {
+  font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.88em;
+  padding: 0.15em 0.45em;
+  border-radius: 4px;
+  background-color: rgba(37, 99, 235, 0.12);
+  color: var(--accent-primary);
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  word-break: break-word;
+}
