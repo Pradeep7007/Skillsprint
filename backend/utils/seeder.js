@@ -43,9 +43,13 @@ const importData = async () => {
     const questionsData = JSON.parse(fs.readFileSync(questionsPath, 'utf-8'));
 
     // Insert Questions
-    console.log(`Seeding ${questionsData.length} questions...`);
-    await Question.insertMany(questionsData);
-    console.log('Questions seeded successfully.');
+    if (questionsData.length > 0) {
+      console.log(`Seeding ${questionsData.length} questions...`);
+      await Question.insertMany(questionsData);
+      console.log('Questions seeded successfully.');
+    } else {
+      console.log('No questions found in questionsSeed.json (0 questions to seed).');
+    }
 
     // Create Default Users
     console.log('Seeding default users...');
@@ -54,7 +58,7 @@ const importData = async () => {
     await User.create({
       name: 'System Admin',
       email: 'admin@portal.com',
-      password: 'admin123',
+      password: 'admin',
       role: 'admin',
     });
 
@@ -62,13 +66,13 @@ const importData = async () => {
     await User.create({
       name: 'Pradeep S',
       email: 'student@portal.com',
-      password: 'student123',
+      password: 'student',
       role: 'student',
     });
 
     console.log('Default users seeded successfully:');
-    console.log(' - Admin: admin@portal.com / admin123');
-    console.log(' - Student: student@portal.com / student123');
+    console.log(' - Admin: admin@portal.com / admin');
+    console.log(' - Student: student@portal.com / student');
 
     console.log('Database Seeding Completed!');
     process.exit();
