@@ -184,28 +184,35 @@ exports.deleteQuestion = async (req, res, next) => {
 // @access  Private/Admin
 exports.uploadQuestionsJSON = async (req, res, next) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please upload a JSON file',
-      });
-    }
-
     let questionsArray;
-    try {
-      const fileContent = req.file.buffer.toString();
-      questionsArray = JSON.parse(fileContent);
-    } catch (e) {
+
+    if (req.file) {
+      try {
+        const fileContent = req.file.buffer.toString();
+        questionsArray = JSON.parse(fileContent);
+      } catch (e) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid JSON file format',
+        });
+      }
+    } else if (Array.isArray(req.body)) {
+      questionsArray = req.body;
+    } else if (req.body && Array.isArray(req.body.questions)) {
+      questionsArray = req.body.questions;
+    } else if (req.body && typeof req.body === 'object' && req.body.question) {
+      questionsArray = [req.body];
+    } else {
       return res.status(400).json({
         success: false,
-        message: 'Invalid JSON file format',
+        message: 'Please provide questions as a JSON file or JSON array/object in request body',
       });
     }
 
     if (!Array.isArray(questionsArray)) {
       return res.status(400).json({
         success: false,
-        message: 'JSON file must contain an array of questions',
+        message: 'Questions must be an array or valid question object',
       });
     }
 

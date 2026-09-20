@@ -27,5 +27,6 @@ router.route('/:id')
   .delete(deleteQuestion);
 
 router.post('/upload', upload.single('file'), uploadQuestionsJSON);
+router.post('/bulk', uploadQuestionsJSON);
 
 module.exports = router;

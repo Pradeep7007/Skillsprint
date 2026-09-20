@@ -2,7 +2,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import SkeletonLoader from '../components/SkeletonLoader';
 import FormattedQuestion from '../components/FormattedQuestion';
-import { SAMPLE_QUESTIONS_BY_CATEGORY, downloadSampleJSON } from '../utils/sampleQuestionsData';
+import {
+  SAMPLE_TOPICS_CONFIG,
+  getSubtopicsByCategory,
+  getQuestionsBySubtopic,
+  getQuestionsByCategory,
+  downloadSubtopicJSON,
+  downloadCategoryJSON
+} from '../utils/sampleQuestionsData';
 
 const AdminQuestions = () => {
   const [questions, setQuestions] = useState([]);
@@ -10,7 +17,19 @@ const AdminQuestions = () => {
   const [topics, setTopics] = useState([]);
   const [pagination, setPagination] = useState({});
   const [loading, setLoading] = useState(true);
+
+  // Sample JSON Category & Sub-Topic Drilldown State
   const [sampleCategory, setSampleCategory] = useState('Technical');
+  const [sampleSubtopic, setSampleSubtopic] = useState('Computer Networks');
+  const [subtopicSort, setSubtopicSort] = useState('default'); // 'default' | 'asc' | 'desc'
+  const [subtopicSearch, setSubtopicSearch] = useState('');
+  const [showJSONPreview, setShowJSONPreview] = useState(false);
+
+  // Add Question Modal Mode: 'form' (manual) or 'json' (paste JSON text)
+  const [modalMode, setModalMode] = useState('form');
+  const [pastedJSONText, setPastedJSONText] = useState('');
+  const [jsonPasteStatus, setJsonPasteStatus] = useState(null);
+  const [submittingPastedJSON, setSubmittingPastedJSON] = useState(false);
 
   // Filters state
   const [search, setSearch] = useState('');
@@ -72,9 +91,12 @@ const AdminQuestions = () => {
   // Open Add modal
   const openAddModal = () => {
     setEditingQuestion(null);
+    setModalMode('form');
+    setPastedJSONText('');
+    setJsonPasteStatus(null);
     setFormData({
-      category: 'Aptitude',
-      topic: '',
+      category: sampleCategory || 'Technical',
+      topic: sampleSubtopic || '',
       difficulty: 'Medium',
       question: '',
       optionA: '',
@@ -89,6 +111,9 @@ const AdminQuestions = () => {
   // Open Edit modal
   const openEditModal = (q) => {
     setEditingQuestion(q);
+    setModalMode('form');
+    setPastedJSONText('');
+    setJsonPasteStatus(null);
     setFormData({
       category: q.category,
       topic: q.topic,
@@ -101,6 +126,146 @@ const AdminQuestions = () => {
       correctAnswer: q.correctAnswer,
       explanation: q.explanation || '',
     });
+  };
+
+  // Parse pasted JSON text and auto-fill manual form fields
+  const handleApplyPastedJSONToForm = () => {
+    if (!pastedJSONText.trim()) {
+      setJsonPasteStatus({ type: 'error', message: 'Please paste JSON text into the box first.' });
+      return;
+    }
+
+    try {
+      let parsed = JSON.parse(pastedJSONText);
+      let targetQ = null;
+
+      if (Array.isArray(parsed)) {
+        if (parsed.length === 0) {
+          setJsonPasteStatus({ type: 'error', message: 'The pasted JSON array contains 0 questions.' });
+          return;
+        }
+        targetQ = parsed[0];
+      } else if (typeof parsed === 'object' && parsed !== null) {
+        targetQ = parsed;
+      } else {
+        setJsonPasteStatus({ type: 'error', message: 'Pasted text must be a valid JSON question object or array.' });
+        return;
+      }
+
+      // Extract options either from options array or optionA-D keys
+      let optionsList = [];
+      if (Array.isArray(targetQ.options) && targetQ.options.length >= 2) {
+        optionsList = targetQ.options;
+      } else if (targetQ.optionA && targetQ.optionB) {
+        optionsList = [targetQ.optionA, targetQ.optionB, targetQ.optionC || '', targetQ.optionD || ''];
+      }
+
+      if (!targetQ.question) {
+        setJsonPasteStatus({ type: 'error', message: 'Pasted JSON is missing the required "question" field.' });
+        return;
+      }
+
+      setFormData({
+        category: targetQ.category || sampleCategory || 'Technical',
+        topic: targetQ.topic || sampleSubtopic || '',
+        difficulty: targetQ.difficulty || 'Medium',
+        question: targetQ.question || '',
+        optionA: optionsList[0] || '',
+        optionB: optionsList[1] || '',
+        optionC: optionsList[2] || '',
+        optionD: optionsList[3] || '',
+        correctAnswer: targetQ.correctAnswer || optionsList[0] || '',
+        explanation: targetQ.explanation || '',
+      });
+
+      setModalMode('form');
+      setToastMessage(
+        Array.isArray(parsed) && parsed.length > 1
+          ? `Filled form with question 1 of ${parsed.length} from pasted JSON!`
+          : 'Pasted JSON auto-filled into form fields successfully!'
+      );
+      setTimeout(() => setToastMessage(''), 3500);
+      setJsonPasteStatus({ type: 'success', message: 'Form populated! Switched to manual form view.' });
+    } catch (err) {
+      setJsonPasteStatus({ type: 'error', message: `Invalid JSON syntax: ${err.message}` });
+    }
+  };
+
+  // Direct import and save of pasted JSON
+  const handleDirectSavePastedJSON = async () => {
+    if (!pastedJSONText.trim()) {
+      setJsonPasteStatus({ type: 'error', message: 'Please paste JSON text into the box first.' });
+      return;
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(pastedJSONText);
+    } catch (err) {
+      setJsonPasteStatus({ type: 'error', message: `Invalid JSON syntax: ${err.message}` });
+      return;
+    }
+
+    try {
+      setSubmittingPastedJSON(true);
+
+      if (Array.isArray(parsed)) {
+        // Bulk import array
+        const res = await axios.post('/questions/bulk', parsed);
+        if (res.data.success) {
+          setToastMessage(res.data.message || `${parsed.length} questions imported successfully!`);
+          fetchQuestions();
+          const closeBtn = document.getElementById('closeModalBtn');
+          if (closeBtn) closeBtn.click();
+          setTimeout(() => setToastMessage(''), 3500);
+        }
+      } else if (typeof parsed === 'object' && parsed !== null) {
+        // Single question
+        const res = await axios.post('/questions', parsed);
+        if (res.data.success) {
+          setToastMessage('Question added successfully via JSON!');
+          fetchQuestions();
+          const closeBtn = document.getElementById('closeModalBtn');
+          if (closeBtn) closeBtn.click();
+          setTimeout(() => setToastMessage(''), 3500);
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      setJsonPasteStatus({
+        type: 'error',
+        message: err.response?.data?.message || err.response?.data?.error || 'Failed to save question(s) from JSON',
+      });
+    } finally {
+      setSubmittingPastedJSON(false);
+    }
+  };
+
+  // Helper to insert current topic sample JSON into paste box
+  const handleInsertSamplePastedJSON = () => {
+    const sample = getQuestionsBySubtopic(sampleCategory, sampleSubtopic);
+    if (sample && sample.length > 0) {
+      setPastedJSONText(JSON.stringify(sample[0], null, 2));
+      setJsonPasteStatus({ type: 'success', message: `Inserted sample for ${sampleCategory} > ${sampleSubtopic}` });
+    } else {
+      const catSample = getQuestionsByCategory(sampleCategory);
+      if (catSample && catSample.length > 0) {
+        setPastedJSONText(JSON.stringify(catSample[0], null, 2));
+        setJsonPasteStatus({ type: 'success', message: `Inserted sample for ${sampleCategory}` });
+      }
+    }
+  };
+
+  // Helper to format/prettify pasted JSON
+  const handlePrettifyPastedJSON = () => {
+    if (!pastedJSONText.trim()) return;
+    try {
+      const parsed = JSON.parse(pastedJSONText);
+      setPastedJSONText(JSON.stringify(parsed, null, 2));
+      setJsonPasteStatus({ type: 'success', message: 'JSON formatted cleanly.' });
+    } catch (err) {
+      setJsonPasteStatus({ type: 'error', message: `Cannot format JSON: ${err.message}` });
+    }
   };
 
   // Submit Question Handler
@@ -171,17 +336,47 @@ const AdminQuestions = () => {
     setSelectedFile(e.target.files[0]);
   };
 
-  const handleDownloadSampleJSON = (category = sampleCategory) => {
-    downloadSampleJSON(category);
-    const count = SAMPLE_QUESTIONS_BY_CATEGORY[category]?.length || 0;
-    setToastMessage(`Downloaded ${category} sample JSON containing all ${count} topics!`);
+  // Switch category and select first sub-topic
+  const handleCategoryChange = (cat) => {
+    setSampleCategory(cat);
+    const subtopics = getSubtopicsByCategory(cat, 'default');
+    if (subtopics && subtopics.length > 0) {
+      setSampleSubtopic(subtopics[0]);
+    } else {
+      setSampleSubtopic('');
+    }
+    setSubtopicSearch('');
+  };
+
+  // Download JSON for selected sub-topic (e.g. Computer Networks, OS, etc.)
+  const handleDownloadSubtopicJSON = (cat = sampleCategory, sub = sampleSubtopic) => {
+    downloadSubtopicJSON(cat, sub);
+    const qList = getQuestionsBySubtopic(cat, sub);
+    setToastMessage(`Downloaded JSON for ${cat} > ${sub} (${qList.length} questions)!`);
     setTimeout(() => setToastMessage(''), 4000);
   };
 
-  const handleCopyJSONSample = () => {
-    const sampleData = SAMPLE_QUESTIONS_BY_CATEGORY[sampleCategory] || SAMPLE_QUESTIONS_BY_CATEGORY['Technical'];
-    navigator.clipboard.writeText(JSON.stringify(sampleData, null, 2));
-    setToastMessage(`Copied ${sampleCategory} sample JSON (${sampleData.length} topics) to clipboard!`);
+  // Download all sub-topics in selected category
+  const handleDownloadCategoryJSON = (cat = sampleCategory) => {
+    downloadCategoryJSON(cat);
+    const qList = getQuestionsByCategory(cat);
+    setToastMessage(`Downloaded ${cat} bundle JSON with all topics (${qList.length} questions)!`);
+    setTimeout(() => setToastMessage(''), 4000);
+  };
+
+  // Copy sub-topic JSON to clipboard
+  const handleCopySubtopicJSON = () => {
+    const data = getQuestionsBySubtopic(sampleCategory, sampleSubtopic);
+    navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+    setToastMessage(`Copied ${sampleCategory} > ${sampleSubtopic} JSON (${data.length} questions) to clipboard!`);
+    setTimeout(() => setToastMessage(''), 4000);
+  };
+
+  // Copy whole category JSON to clipboard
+  const handleCopyCategoryJSON = () => {
+    const data = getQuestionsByCategory(sampleCategory);
+    navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+    setToastMessage(`Copied all ${sampleCategory} sample questions (${data.length} questions) to clipboard!`);
     setTimeout(() => setToastMessage(''), 4000);
   };
 
@@ -217,6 +412,12 @@ const AdminQuestions = () => {
       setUploading(false);
     }
   };
+
+  const displayedSubtopics = getSubtopicsByCategory(sampleCategory, subtopicSort).filter((st) =>
+    st.toLowerCase().includes(subtopicSearch.toLowerCase().trim())
+  );
+  const currentSubtopicQuestions = getQuestionsBySubtopic(sampleCategory, sampleSubtopic);
+  const currentCategoryQuestions = getQuestionsByCategory(sampleCategory);
 
   return (
     <div className="container py-5">
@@ -274,39 +475,182 @@ const AdminQuestions = () => {
             </div>
             <p className="text-muted small mb-3">Upload a <code>.json</code> file to import questions. Select a category below to download a reference sample containing <strong>all topics</strong>.</p>
             
-            {/* Category selection for sample template download */}
+            {/* Step-by-Step Sample JSON Template Downloader */}
             <div className="p-3 rounded-3 border mb-3" style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-color)' }}>
-              <div className="d-flex justify-content-between align-items-center mb-1.5">
-                <label className="form-label small fw-bold mb-0 text-muted">
-                  <i className="bi bi-collection me-1 text-primary"></i> Sample JSON Category:
-                </label>
-                <span className="badge bg-primary-subtle text-primary border small">
-                  {SAMPLE_QUESTIONS_BY_CATEGORY[sampleCategory]?.length} Topics Included
-                </span>
+              
+              {/* Step 1: Select Category */}
+              <div className="mb-2.5">
+                <div className="d-flex justify-content-between align-items-center mb-1">
+                  <label className="form-label small fw-bold mb-0 text-muted">
+                    <span className="badge bg-primary text-white rounded-circle me-1.5" style={{ width: '18px', height: '18px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>1</span>
+                    Category:
+                  </label>
+                  <span className="badge bg-primary-subtle text-primary border" style={{ fontSize: '10.5px' }}>
+                    {SAMPLE_TOPICS_CONFIG[sampleCategory]?.length || 0} Topics
+                  </span>
+                </div>
+                <div className="btn-group btn-group-sm w-100" role="group">
+                  {['Technical', 'Aptitude', 'Logical', 'Verbal'].map((cat) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      className={`btn fw-semibold ${sampleCategory === cat ? 'btn-primary-custom' : 'btn-outline-secondary'}`}
+                      style={{ fontSize: '11.5px', padding: '0.35rem 0.5rem' }}
+                      onClick={() => handleCategoryChange(cat)}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div className="input-group input-group-sm">
+
+              {/* Step 2: Select Topic & Sorting */}
+              <div className="mb-2.5">
+                <div className="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-1">
+                  <label className="form-label small fw-bold mb-0 text-muted">
+                    <span className="badge bg-primary text-white rounded-circle me-1.5" style={{ width: '18px', height: '18px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>2</span>
+                    Topic / Sub-Topic:
+                  </label>
+                  
+                  {/* Sorting dropdown */}
+                  <div className="d-flex align-items-center gap-1">
+                    <span className="text-muted" style={{ fontSize: '11px' }}>Sort:</span>
+                    <select
+                      className="form-select form-select-sm py-0 px-1.5"
+                      style={{ fontSize: '11px', width: 'auto', height: '22px', borderColor: 'var(--border-color)' }}
+                      value={subtopicSort}
+                      onChange={(e) => setSubtopicSort(e.target.value)}
+                      title="Sort topics list"
+                    >
+                      <option value="default">Default</option>
+                      <option value="asc">A → Z</option>
+                      <option value="desc">Z → A</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Topic dropdown */}
                 <select
-                  className="form-select form-select-sm fw-medium"
-                  value={sampleCategory}
-                  onChange={(e) => setSampleCategory(e.target.value)}
-                  style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)', borderColor: 'var(--border-color)' }}
+                  className="form-select form-select-sm fw-medium mb-1.5"
+                  value={sampleSubtopic}
+                  onChange={(e) => setSampleSubtopic(e.target.value)}
+                  style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)', borderColor: 'var(--border-color)', fontSize: '12.5px' }}
                 >
-                  <option value="Technical">Technical (All 16 Topics)</option>
-                  <option value="Aptitude">Aptitude (All 12 Topics)</option>
-                  <option value="Logical">Logical (All 8 Topics)</option>
-                  <option value="Verbal">Verbal (All 8 Topics)</option>
-                  <option value="All Categories">All Categories (All 44 Topics)</option>
+                  <option value="__ALL__">★ All {sampleCategory} Topics ({currentCategoryQuestions.length} Questions Bundle)</option>
+                  <optgroup label={`${sampleCategory} Sub-Topics (${subtopicSort === 'asc' ? 'A-Z' : subtopicSort === 'desc' ? 'Z-A' : 'Curriculum Order'})`}>
+                    {displayedSubtopics.map((t) => (
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
+                    ))}
+                  </optgroup>
                 </select>
-                <button
-                  type="button"
-                  className="btn btn-primary-custom btn-sm px-3"
-                  onClick={() => handleDownloadSampleJSON(sampleCategory)}
-                  title={`Download sample_${sampleCategory.toLowerCase().replace(/\s+/g, '_')}.json with all topics`}
+
+                {/* Clickable Quick Topic Chips */}
+                <div
+                  className="d-flex flex-wrap gap-1 p-1.5 rounded-2 border"
+                  style={{
+                    maxHeight: '85px',
+                    overflowY: 'auto',
+                    backgroundColor: 'var(--bg-secondary)',
+                    borderColor: 'var(--border-color)'
+                  }}
                 >
-                  <i className="bi bi-download me-1"></i>
-                  Download
-                </button>
+                  {displayedSubtopics.map((t) => {
+                    const isSelected = sampleSubtopic === t;
+                    return (
+                      <button
+                        key={t}
+                        type="button"
+                        className={`btn btn-sm py-0 px-1.5 rounded-pill text-nowrap ${
+                          isSelected ? 'btn-primary-custom' : 'btn-outline-secondary'
+                        }`}
+                        style={{ fontSize: '10.5px' }}
+                        onClick={() => setSampleSubtopic(t)}
+                      >
+                        {isSelected && <i className="bi bi-check2 me-0.5"></i>}
+                        {t}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
+
+              {/* Step 3: Download Sample JSON */}
+              <div className="p-2.5 rounded-2 border" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
+                <div className="d-flex justify-content-between align-items-center mb-2">
+                  <div className="text-truncate me-2" style={{ fontSize: '12px' }}>
+                    <span className="text-muted fw-semibold">Target: </span>
+                    <span className="badge bg-primary-subtle text-primary border me-1" style={{ fontSize: '10.5px' }}>{sampleCategory}</span>
+                    <strong className="text-primary text-truncate">
+                      {sampleSubtopic === '__ALL__' ? `All Topics` : sampleSubtopic}
+                    </strong>
+                  </div>
+                  <span className="badge bg-secondary-subtle text-secondary small">
+                    {sampleSubtopic === '__ALL__' ? currentCategoryQuestions.length : currentSubtopicQuestions.length} Qs
+                  </span>
+                </div>
+
+                <div className="d-flex gap-1.5">
+                  <button
+                    type="button"
+                    className="btn btn-primary-custom btn-sm flex-grow-1 fw-semibold py-1.5 d-flex align-items-center justify-content-center"
+                    style={{ fontSize: '12px' }}
+                    onClick={() => {
+                      if (sampleSubtopic === '__ALL__') {
+                        handleDownloadCategoryJSON(sampleCategory);
+                      } else {
+                        handleDownloadSubtopicJSON(sampleCategory, sampleSubtopic);
+                      }
+                    }}
+                    title={`Download sample JSON for ${sampleSubtopic === '__ALL__' ? `All ${sampleCategory} Topics` : `${sampleCategory} > ${sampleSubtopic}`}`}
+                  >
+                    <i className="bi bi-download me-1.5"></i>
+                    Download Sample JSON
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary btn-sm px-2 py-1.5"
+                    onClick={() => {
+                      if (sampleSubtopic === '__ALL__') {
+                        handleCopyCategoryJSON();
+                      } else {
+                        handleCopySubtopicJSON();
+                      }
+                    }}
+                    title="Copy JSON to clipboard"
+                  >
+                    <i className="bi bi-clipboard"></i>
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn btn-sm px-2 py-1.5 ${showJSONPreview ? 'btn-secondary' : 'btn-outline-secondary'}`}
+                    onClick={() => setShowJSONPreview(!showJSONPreview)}
+                    title="Toggle JSON Preview"
+                  >
+                    <i className="bi bi-code-slash"></i>
+                  </button>
+                </div>
+
+                {showJSONPreview && (
+                  <div className="mt-2 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
+                    <pre
+                      className="p-2 rounded-2 border text-start mb-0"
+                      style={{
+                        backgroundColor: 'var(--bg-tertiary)',
+                        color: 'var(--text-primary)',
+                        fontSize: '10.5px',
+                        maxHeight: '130px',
+                        overflowX: 'auto',
+                        overflowY: 'auto'
+                      }}
+                    >
+                      {JSON.stringify(sampleSubtopic === '__ALL__' ? currentCategoryQuestions : currentSubtopicQuestions, null, 2)}
+                    </pre>
+                  </div>
+                )}
+              </div>
+
             </div>
 
             <form onSubmit={handleJSONUpload} className="mt-auto">
@@ -518,10 +862,22 @@ const AdminQuestions = () => {
       <div className="modal fade" id="questionModal" tabIndex="-1" aria-labelledby="questionModalLabel" aria-hidden="true">
         <div className="modal-dialog modal-dialog-centered modal-lg">
           <div className="modal-content glass-card border-0" style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+            
+            {/* Modal Header */}
             <div className="modal-header border-bottom" style={{ borderColor: 'var(--border-color)' }}>
-              <h5 className="modal-title fw-bold" id="questionModalLabel">
-                {editingQuestion ? 'Edit Question Details' : 'Add New Question'}
-              </h5>
+              <div className="d-flex align-items-center gap-2">
+                <div className="rounded-circle p-1.5 d-flex align-items-center justify-content-center" style={{ backgroundColor: 'rgba(37, 99, 235, 0.1)', color: 'var(--accent-primary)', width: '36px', height: '36px' }}>
+                  <i className={`bi ${editingQuestion ? 'bi-pencil-square' : modalMode === 'json' ? 'bi-code-square' : 'bi-plus-circle-fill'} fs-5`}></i>
+                </div>
+                <div>
+                  <h5 className="modal-title fw-bold mb-0" id="questionModalLabel">
+                    {editingQuestion ? 'Edit Question Details' : 'Add New Question'}
+                  </h5>
+                  <small className="text-muted" style={{ fontSize: '11.5px' }}>
+                    {modalMode === 'json' ? 'Paste raw JSON text to auto-fill form or directly import' : 'Fill in the fields manually or paste JSON to auto-populate'}
+                  </small>
+                </div>
+              </div>
               <button
                 id="closeModalBtn"
                 type="button"
@@ -531,173 +887,357 @@ const AdminQuestions = () => {
                 style={{ filter: 'var(--text-primary)' === '#f9fafb' ? 'invert(1)' : 'none' }}
               ></button>
             </div>
-            <form onSubmit={handleFormSubmit}>
-              <div className="modal-body p-4" style={{ maxHeight: '65vh', overflowY: 'auto' }}>
-                <div className="row g-3">
-                  {/* Category */}
-                  <div className="col-12 col-md-4">
-                    <label className="form-label small fw-semibold">Category</label>
-                    <select
-                      className="form-select"
-                      name="category"
-                      value={formData.category}
-                      onChange={handleInputChange}
-                      required
+
+            {/* Mode Selector Tabs (Manual Form vs Paste JSON) */}
+            <div className="px-4 pt-3 pb-0">
+              <div className="btn-group btn-group-sm w-100 p-1 rounded-3 border" style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-color)' }}>
+                <button
+                  type="button"
+                  className={`btn rounded-2 fw-semibold py-1.5 ${modalMode === 'form' ? 'btn-primary-custom shadow-sm' : 'btn-outline-secondary border-0 text-muted'}`}
+                  style={{ fontSize: '12.5px' }}
+                  onClick={() => setModalMode('form')}
+                >
+                  <i className="bi bi-pencil-square me-1.5"></i>
+                  Manual Form Entry
+                </button>
+                <button
+                  type="button"
+                  className={`btn rounded-2 fw-semibold py-1.5 ${modalMode === 'json' ? 'btn-primary-custom shadow-sm' : 'btn-outline-secondary border-0 text-muted'}`}
+                  style={{ fontSize: '12.5px' }}
+                  onClick={() => setModalMode('json')}
+                >
+                  <i className="bi bi-code-square me-1.5"></i>
+                  Paste JSON as Text
+                  <span className="badge bg-success-subtle text-success ms-1.5 border" style={{ fontSize: '10px' }}>⚡ Auto-Fill</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Mode 1: Manual Form */}
+            {modalMode === 'form' ? (
+              <form onSubmit={handleFormSubmit}>
+                <div className="modal-body px-4 py-3" style={{ maxHeight: '65vh', overflowY: 'auto' }}>
+                  
+                  {/* Quick helper banner to switch to JSON paste */}
+                  <div className="d-flex justify-content-between align-items-center p-2 px-3 rounded-2 border mb-3" style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-color)' }}>
+                    <span className="small text-muted" style={{ fontSize: '12px' }}>
+                      <i className="bi bi-info-circle text-primary me-1"></i>
+                      Have a JSON snippet? Paste it to auto-populate all fields instantly:
+                    </span>
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-outline-primary py-0 px-2 fw-semibold"
+                      style={{ fontSize: '11.5px' }}
+                      onClick={() => setModalMode('json')}
                     >
-                      <option value="Aptitude">Aptitude</option>
-                      <option value="Logical">Logical</option>
-                      <option value="Verbal">Verbal</option>
-                      <option value="Technical">Technical</option>
-                    </select>
+                      <i className="bi bi-clipboard-plus me-1"></i>
+                      Paste JSON
+                    </button>
                   </div>
 
-                  {/* Topic */}
-                  <div className="col-12 col-md-4">
-                    <label className="form-label small fw-semibold">Topic</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="e.g. Operating Systems"
-                      name="topic"
-                      value={formData.topic}
-                      onChange={handleInputChange}
-                      required
-                    />
+                  <div className="row g-3">
+                    {/* Category */}
+                    <div className="col-12 col-md-4">
+                      <label className="form-label small fw-semibold">Category</label>
+                      <select
+                        className="form-select"
+                        name="category"
+                        value={formData.category}
+                        onChange={handleInputChange}
+                        required
+                      >
+                        <option value="Aptitude">Aptitude</option>
+                        <option value="Logical">Logical</option>
+                        <option value="Verbal">Verbal</option>
+                        <option value="Technical">Technical</option>
+                      </select>
+                    </div>
+
+                    {/* Topic */}
+                    <div className="col-12 col-md-4">
+                      <label className="form-label small fw-semibold">Topic</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="e.g. Operating Systems"
+                        name="topic"
+                        value={formData.topic}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+
+                    {/* Difficulty */}
+                    <div className="col-12 col-md-4">
+                      <label className="form-label small fw-semibold">Difficulty</label>
+                      <select
+                        className="form-select"
+                        name="difficulty"
+                        value={formData.difficulty}
+                        onChange={handleInputChange}
+                        required
+                      >
+                        <option value="Easy">Easy</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Hard">Hard</option>
+                      </select>
+                    </div>
+
+                    {/* Question */}
+                    <div className="col-12">
+                      <label className="form-label small fw-semibold d-flex justify-content-between">
+                        <span>Question Text (Supports Markdown Code Blocks & Indented Pseudocode)</span>
+                        <span className="text-muted small">Use <code>```lang</code> or standard indents</span>
+                      </label>
+                      <textarea
+                        className="form-control"
+                        rows="4"
+                        placeholder="Type question content or paste code/pseudocode with indentation..."
+                        name="question"
+                        value={formData.question}
+                        onChange={handleInputChange}
+                        style={{ fontFamily: "'Fira Code', Consolas, Monaco, monospace", fontSize: '0.88rem' }}
+                        required
+                      ></textarea>
+                      {formData.question && (formData.question.includes('\n') || formData.question.includes('`')) && (
+                        <div className="mt-2 p-2.5 rounded-3 border" style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-color)' }}>
+                          <span className="small text-muted fw-bold d-block mb-1">
+                            <i className="bi bi-eye me-1"></i> Live Code & Indentation Preview:
+                          </span>
+                          <FormattedQuestion text={formData.question} />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Options (A to D) */}
+                    <div className="col-12 col-md-6">
+                      <label className="form-label small fw-semibold">Option A</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Value A"
+                        name="optionA"
+                        value={formData.optionA}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="col-12 col-md-6">
+                      <label className="form-label small fw-semibold">Option B</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Value B"
+                        name="optionB"
+                        value={formData.optionB}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="col-12 col-md-6">
+                      <label className="form-label small fw-semibold">Option C</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Value C"
+                        name="optionC"
+                        value={formData.optionC}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="col-12 col-md-6">
+                      <label className="form-label small fw-semibold">Option D</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Value D"
+                        name="optionD"
+                        value={formData.optionD}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+
+                    {/* Correct Answer */}
+                    <div className="col-12">
+                      <label className="form-label small fw-semibold">
+                        Correct Answer <span className="text-danger">*</span> (Must match one of the 4 options)
+                      </label>
+                      <select
+                        className="form-select"
+                        name="correctAnswer"
+                        value={formData.correctAnswer}
+                        onChange={handleInputChange}
+                        required
+                      >
+                        <option value="">-- Select Correct Answer --</option>
+                        {formData.optionA && <option value={formData.optionA}>Option A: {formData.optionA}</option>}
+                        {formData.optionB && <option value={formData.optionB}>Option B: {formData.optionB}</option>}
+                        {formData.optionC && <option value={formData.optionC}>Option C: {formData.optionC}</option>}
+                        {formData.optionD && <option value={formData.optionD}>Option D: {formData.optionD}</option>}
+                      </select>
+                    </div>
+
+                    {/* Explanation */}
+                    <div className="col-12">
+                      <label className="form-label small fw-semibold">Explanation (Optional)</label>
+                      <textarea
+                        className="form-control"
+                        rows="2"
+                        placeholder="Why is this answer correct?"
+                        name="explanation"
+                        value={formData.explanation}
+                        onChange={handleInputChange}
+                      ></textarea>
+                    </div>
+                  </div>
+                </div>
+                <div className="modal-footer border-top" style={{ borderColor: 'var(--border-color)' }}>
+                  <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary-custom">
+                    {editingQuestion ? 'Save Changes' : 'Create Question'}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              /* Mode 2: Paste JSON as Text */
+              <div>
+                <div className="modal-body px-4 py-3" style={{ maxHeight: '65vh', overflowY: 'auto' }}>
+                  
+                  {/* Toolbar with sample helpers */}
+                  <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                    <div>
+                      <span className="small fw-bold text-muted">
+                        <i className="bi bi-file-earmark-code me-1 text-primary"></i>
+                        JSON Payload (Single Question or Array)
+                      </span>
+                    </div>
+                    <div className="d-flex gap-1.5">
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-primary py-0.5 px-2"
+                        style={{ fontSize: '11.5px' }}
+                        onClick={handleInsertSamplePastedJSON}
+                        title="Insert ready sample JSON for current category & topic"
+                      >
+                        <i className="bi bi-magic me-1"></i>
+                        Insert {sampleSubtopic ? `"${sampleSubtopic}"` : sampleCategory} Sample
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-secondary py-0.5 px-2"
+                        style={{ fontSize: '11.5px' }}
+                        onClick={handlePrettifyPastedJSON}
+                        disabled={!pastedJSONText.trim()}
+                        title="Format JSON with indentation"
+                      >
+                        <i className="bi bi-text-indent-left me-1"></i>
+                        Format JSON
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-secondary py-0.5 px-2"
+                        style={{ fontSize: '11.5px' }}
+                        onClick={() => {
+                          setPastedJSONText('');
+                          setJsonPasteStatus(null);
+                        }}
+                        disabled={!pastedJSONText}
+                        title="Clear editor"
+                      >
+                        <i className="bi bi-trash"></i>
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Difficulty */}
-                  <div className="col-12 col-md-4">
-                    <label className="form-label small fw-semibold">Difficulty</label>
-                    <select
-                      className="form-select"
-                      name="difficulty"
-                      value={formData.difficulty}
-                      onChange={handleInputChange}
-                      required
+                  {/* Textarea for JSON */}
+                  <textarea
+                    className="form-control mb-2"
+                    rows="10"
+                    placeholder={`Paste question JSON text here...\nExample:\n{\n  "category": "${sampleCategory}",\n  "topic": "${sampleSubtopic || 'General'}",\n  "difficulty": "Medium",\n  "question": "Sample question statement?",\n  "options": ["Option A", "Option B", "Option C", "Option D"],\n  "correctAnswer": "Option A",\n  "explanation": "Why Option A is correct"\n}`}
+                    value={pastedJSONText}
+                    onChange={(e) => {
+                      setPastedJSONText(e.target.value);
+                      setJsonPasteStatus(null);
+                    }}
+                    style={{
+                      fontFamily: "'Fira Code', Consolas, Monaco, monospace",
+                      fontSize: '0.84rem',
+                      lineHeight: '1.5',
+                      tabSize: 2,
+                      backgroundColor: 'var(--bg-tertiary)',
+                      color: 'var(--text-primary)',
+                      borderColor: jsonPasteStatus?.type === 'error' ? 'var(--color-danger)' : 'var(--border-color)'
+                    }}
+                  ></textarea>
+
+                  {/* Status & Validation Message */}
+                  {jsonPasteStatus && (
+                    <div
+                      className={`alert py-2 px-3 small d-flex align-items-center mb-0 ${
+                        jsonPasteStatus.type === 'error' ? 'alert-danger' : 'alert-success'
+                      }`}
+                      style={{ fontSize: '12px' }}
                     >
-                      <option value="Easy">Easy</option>
-                      <option value="Medium">Medium</option>
-                      <option value="Hard">Hard</option>
-                    </select>
-                  </div>
+                      <i className={`bi ${jsonPasteStatus.type === 'error' ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill'} me-2`}></i>
+                      <span>{jsonPasteStatus.message}</span>
+                    </div>
+                  )}
 
-                  {/* Question */}
-                  <div className="col-12">
-                    <label className="form-label small fw-semibold d-flex justify-content-between">
-                      <span>Question Text (Supports Markdown Code Blocks & Indented Pseudocode)</span>
-                      <span className="text-muted small">Use <code>```lang</code> or standard indents</span>
-                    </label>
-                    <textarea
-                      className="form-control"
-                      rows="4"
-                      placeholder="Type question content or paste code/pseudocode with indentation..."
-                      name="question"
-                      value={formData.question}
-                      onChange={handleInputChange}
-                      style={{ fontFamily: "'Fira Code', Consolas, Monaco, monospace", fontSize: '0.88rem' }}
-                      required
-                    ></textarea>
-                    {formData.question && (formData.question.includes('\n') || formData.question.includes('`')) && (
-                      <div className="mt-2 p-2.5 rounded-3 border" style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-color)' }}>
-                        <span className="small text-muted fw-bold d-block mb-1">
-                          <i className="bi bi-eye me-1"></i> Live Code & Indentation Preview:
-                        </span>
-                        <FormattedQuestion text={formData.question} />
-                      </div>
-                    )}
-                  </div>
+                  {!jsonPasteStatus && (
+                    <div className="d-flex justify-content-between align-items-center text-muted small" style={{ fontSize: '11.5px' }}>
+                      <span>
+                        <i className="bi bi-lightbulb me-1 text-warning"></i>
+                        Supports single question object <code>&#123;...&#125;</code> or array of questions <code>[...]</code>.
+                      </span>
+                      <span>{pastedJSONText.length} characters</span>
+                    </div>
+                  )}
+                </div>
 
-                  {/* Options (A to D) */}
-                  <div className="col-12 col-md-6">
-                    <label className="form-label small fw-semibold">Option A</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Value A"
-                      name="optionA"
-                      value={formData.optionA}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="col-12 col-md-6">
-                    <label className="form-label small fw-semibold">Option B</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Value B"
-                      name="optionB"
-                      value={formData.optionB}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="col-12 col-md-6">
-                    <label className="form-label small fw-semibold">Option C</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Value C"
-                      name="optionC"
-                      value={formData.optionC}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="col-12 col-md-6">
-                    <label className="form-label small fw-semibold">Option D</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Value D"
-                      name="optionD"
-                      value={formData.optionD}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-
-                  {/* Correct Answer */}
-                  <div className="col-12">
-                    <label className="form-label small fw-semibold text-success">Correct Answer (Match text exactly)</label>
-                    <select
-                      className="form-select border-success"
-                      name="correctAnswer"
-                      value={formData.correctAnswer}
-                      onChange={handleInputChange}
-                      required
+                {/* Footer for Paste JSON mode */}
+                <div className="modal-footer border-top d-flex justify-content-between" style={{ borderColor: 'var(--border-color)' }}>
+                  <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancel
+                  </button>
+                  <div className="d-flex gap-2">
+                    <button
+                      type="button"
+                      className="btn btn-primary-custom fw-semibold"
+                      onClick={handleApplyPastedJSONToForm}
+                      disabled={!pastedJSONText.trim()}
+                      title="Parse JSON and populate form fields for review"
                     >
-                      <option value="">Select correct option</option>
-                      {formData.optionA && <option value={formData.optionA}>A: {formData.optionA}</option>}
-                      {formData.optionB && <option value={formData.optionB}>B: {formData.optionB}</option>}
-                      {formData.optionC && <option value={formData.optionC}>C: {formData.optionC}</option>}
-                      {formData.optionD && <option value={formData.optionD}>D: {formData.optionD}</option>}
-                    </select>
-                  </div>
-
-                  {/* Explanation */}
-                  <div className="col-12">
-                    <label className="form-label small fw-semibold">Explanation (Optional)</label>
-                    <textarea
-                      className="form-control"
-                      rows="2"
-                      placeholder="Why is this answer correct?"
-                      name="explanation"
-                      value={formData.explanation}
-                      onChange={handleInputChange}
-                    ></textarea>
+                      <i className="bi bi-pencil-square me-1.5"></i>
+                      Auto-Fill into Form
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-success fw-semibold"
+                      onClick={handleDirectSavePastedJSON}
+                      disabled={!pastedJSONText.trim() || submittingPastedJSON}
+                      title="Directly save without manual review"
+                    >
+                      {submittingPastedJSON ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm me-1.5" role="status"></span>
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <i className="bi bi-cloud-arrow-up-fill me-1.5"></i>
+                          Direct Import &amp; Save
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
               </div>
-              <div className="modal-footer border-top" style={{ borderColor: 'var(--border-color)' }}>
-                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary-custom">
-                  {editingQuestion ? 'Save Changes' : 'Create Question'}
-                </button>
-              </div>
-            </form>
+            )}
+
           </div>
         </div>
       </div>
@@ -785,60 +1325,130 @@ const AdminQuestions = () => {
                 </table>
               </div>
 
-              {/* Category Selector Tabs inside Modal */}
+              {/* Step 1 & 2: Category and Topic Selection inside Modal */}
               <div className="mb-3 p-3 rounded-3 border" style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-color)' }}>
                 <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
                   <span className="small fw-bold text-muted">
-                    <i className="bi bi-funnel me-1 text-primary"></i>
-                    Select Category to Preview & Download:
+                    <span className="badge bg-primary text-white rounded-circle me-1" style={{ width: '18px', height: '18px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>1</span>
+                    Select Category:
                   </span>
                   <span className="badge bg-primary-subtle text-primary border small">
-                    {SAMPLE_QUESTIONS_BY_CATEGORY[sampleCategory]?.length} Topics Covered
+                    {SAMPLE_TOPICS_CONFIG[sampleCategory]?.length || 0} Topics Available
                   </span>
                 </div>
-                <div className="btn-group btn-group-sm w-100 flex-wrap" role="group">
-                  {['Technical', 'Aptitude', 'Logical', 'Verbal', 'All Categories'].map((cat) => (
+                <div className="btn-group btn-group-sm w-100 flex-wrap mb-3" role="group">
+                  {['Technical', 'Aptitude', 'Logical', 'Verbal'].map((cat) => (
                     <button
                       key={cat}
                       type="button"
-                      className={`btn ${sampleCategory === cat ? 'btn-primary-custom' : 'btn-outline-secondary'}`}
-                      onClick={() => setSampleCategory(cat)}
-                      style={{ fontSize: '0.8rem' }}
+                      className={`btn fw-semibold ${sampleCategory === cat ? 'btn-primary-custom' : 'btn-outline-secondary'}`}
+                      onClick={() => handleCategoryChange(cat)}
+                      style={{ fontSize: '0.82rem' }}
                     >
-                      {cat} ({SAMPLE_QUESTIONS_BY_CATEGORY[cat]?.length})
+                      {cat} ({SAMPLE_TOPICS_CONFIG[cat]?.length})
                     </button>
                   ))}
                 </div>
 
-                {/* Topics Badges */}
-                <div className="mt-2.5 pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
-                  <span className="small text-muted fw-semibold d-block mb-1.5">
-                    Topics included in this {sampleCategory} sample ({SAMPLE_QUESTIONS_BY_CATEGORY[sampleCategory]?.length}):
-                  </span>
-                  <div className="d-flex flex-wrap gap-1">
-                    {SAMPLE_QUESTIONS_BY_CATEGORY[sampleCategory]?.map((q, idx) => (
-                      <span key={idx} className="badge bg-secondary-subtle text-secondary border small">
-                        {q.topic}
-                      </span>
-                    ))}
+                {/* Topics Selection with Sorting */}
+                <div className="pt-2 border-top" style={{ borderColor: 'var(--border-color)' }}>
+                  <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                    <span className="small text-muted fw-bold">
+                      <span className="badge bg-primary text-white rounded-circle me-1" style={{ width: '18px', height: '18px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>2</span>
+                      Select Topic in {sampleCategory}:
+                    </span>
+                    <div className="d-flex align-items-center gap-1.5">
+                      <span className="text-muted small" style={{ fontSize: '11.5px' }}>Sort:</span>
+                      <select
+                        className="form-select form-select-sm py-0 px-2"
+                        style={{ fontSize: '11.5px', width: 'auto', height: '24px' }}
+                        value={subtopicSort}
+                        onChange={(e) => setSubtopicSort(e.target.value)}
+                      >
+                        <option value="default">Default</option>
+                        <option value="asc">A → Z</option>
+                        <option value="desc">Z → A</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="d-flex flex-wrap gap-1.5">
+                    <button
+                      type="button"
+                      className={`btn btn-sm py-1 px-2.5 rounded-pill ${
+                        sampleSubtopic === '__ALL__' ? 'btn-primary-custom' : 'btn-outline-secondary'
+                      }`}
+                      style={{ fontSize: '11.5px' }}
+                      onClick={() => setSampleSubtopic('__ALL__')}
+                    >
+                      ★ All {sampleCategory} Topics ({currentCategoryQuestions.length} Qs)
+                    </button>
+                    {displayedSubtopics.map((t) => {
+                      const isSelected = sampleSubtopic === t;
+                      const qCount = getQuestionsBySubtopic(sampleCategory, t).length;
+                      return (
+                        <button
+                          key={t}
+                          type="button"
+                          className={`btn btn-sm py-1 px-2.5 rounded-pill ${
+                            isSelected ? 'btn-primary-custom' : 'btn-outline-secondary'
+                          }`}
+                          style={{ fontSize: '11.5px' }}
+                          onClick={() => setSampleSubtopic(t)}
+                        >
+                          {isSelected && <i className="bi bi-check2 me-1"></i>}
+                          {t} ({qCount})
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
 
+              {/* Step 3: Code Example and Actions */}
               <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
-                <h6 className="fw-bold mb-0">2. Valid JSON Code Example ({sampleCategory})</h6>
+                <div>
+                  <h6 className="fw-bold mb-0">
+                    3. JSON Code Example:
+                    <span className="text-primary ms-1.5">
+                      {sampleCategory} &gt; {sampleSubtopic === '__ALL__' ? `All Topics` : sampleSubtopic}
+                    </span>
+                  </h6>
+                  <small className="text-muted">
+                    {sampleSubtopic === '__ALL__' ? currentCategoryQuestions.length : currentSubtopicQuestions.length} Questions in this JSON
+                  </small>
+                </div>
                 <div className="d-flex gap-2">
-                  <button className="btn btn-sm btn-outline-secondary" onClick={handleCopyJSONSample}>
-                    <i className="bi bi-clipboard me-1"></i> Copy Sample JSON
+                  <button
+                    className="btn btn-sm btn-outline-secondary"
+                    onClick={() => {
+                      if (sampleSubtopic === '__ALL__') {
+                        handleCopyCategoryJSON();
+                      } else {
+                        handleCopySubtopicJSON();
+                      }
+                    }}
+                  >
+                    <i className="bi bi-clipboard me-1"></i> Copy JSON
                   </button>
-                  <button className="btn btn-sm btn-primary-custom" onClick={() => handleDownloadSampleJSON(sampleCategory)}>
-                    <i className="bi bi-download me-1"></i> Download sample_{sampleCategory.toLowerCase().replace(/\s+/g, '_')}.json
+                  <button
+                    className="btn btn-sm btn-primary-custom"
+                    onClick={() => {
+                      if (sampleSubtopic === '__ALL__') {
+                        handleDownloadCategoryJSON(sampleCategory);
+                      } else {
+                        handleDownloadSubtopicJSON(sampleCategory, sampleSubtopic);
+                      }
+                    }}
+                  >
+                    <i className="bi bi-download me-1"></i>
+                    Download {sampleSubtopic === '__ALL__' ? `All ${sampleCategory} Topics` : sampleSubtopic} JSON
                   </button>
                 </div>
               </div>
 
               <pre className="p-3 rounded-3 border text-start small mb-0" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)', overflowX: 'auto', maxHeight: '280px' }}>
-                {JSON.stringify(SAMPLE_QUESTIONS_BY_CATEGORY[sampleCategory] || [], null, 2)}
+                {JSON.stringify(sampleSubtopic === '__ALL__' ? currentCategoryQuestions : currentSubtopicQuestions, null, 2)}
               </pre>
             </div>
             <div className="modal-footer border-top" style={{ borderColor: 'var(--border-color)' }}>
