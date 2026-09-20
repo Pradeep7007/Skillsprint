@@ -11,7 +11,6 @@ import { ThemeProvider } from './context/ThemeContext';
 
 // Components
 import Navbar from './components/Navbar';
-import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // Pages
@@ -37,82 +36,81 @@ function AppContent() {
       style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}
     >
       {!isTestRoute && <Navbar />}
-      <main className={`flex-grow-1 ${isTestRoute ? 'overflow-hidden d-flex flex-column' : ''}`}>
+      <main className={`flex-grow-1 d-flex flex-column ${isTestRoute ? 'overflow-hidden' : ''}`}>
         <Routes>
-                {/* Public Auth Routes */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/resetpassword/:token" element={<ResetPassword />} />
+          {/* Public Auth Routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/resetpassword/:token" element={<ResetPassword />} />
 
-                {/* Protected Student Routes */}
-                <Route
-                  path="/"
-                  element={
-                    <ProtectedRoute adminOnly={false}>
-                      <Dashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/test/:category"
-                  element={
-                    <ProtectedRoute adminOnly={false}>
-                      <TestPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/history"
-                  element={
-                    <ProtectedRoute adminOnly={false}>
-                      <TestHistory />
-                    </ProtectedRoute>
-                  }
-                />
+          {/* Protected Student Routes */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute adminOnly={false}>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/test/:category"
+            element={
+              <ProtectedRoute adminOnly={false}>
+                <TestPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/history"
+            element={
+              <ProtectedRoute adminOnly={false}>
+                <TestHistory />
+              </ProtectedRoute>
+            }
+          />
 
-                {/* Common Protected Routes (Both student and admin can view results) */}
-                <Route
-                  path="/result/:id"
-                  element={
-                    <ProtectedRoute>
-                      <ResultPage />
-                    </ProtectedRoute>
-                  }
-                />
+          {/* Common Protected Routes (Both student and admin can view results) */}
+          <Route
+            path="/result/:id"
+            element={
+              <ProtectedRoute>
+                <ResultPage />
+              </ProtectedRoute>
+            }
+          />
 
-                {/* Protected Admin Routes */}
-                <Route
-                  path="/admin"
-                  element={
-                    <ProtectedRoute adminOnly={true}>
-                      <AdminDashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin/questions"
-                  element={
-                    <ProtectedRoute adminOnly={true}>
-                      <AdminQuestions />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin/violations"
-                  element={
-                    <ProtectedRoute adminOnly={true}>
-                      <AdminViolations />
-                    </ProtectedRoute>
-                  }
-                />
+          {/* Protected Admin Routes */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/questions"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <AdminQuestions />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/violations"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <AdminViolations />
+              </ProtectedRoute>
+            }
+          />
 
-                {/* Catch all redirect to home */}
-                <Route path="*" element={<Dashboard />} />
-              </Routes>
-            </main>
-            {!isTestRoute && <Footer />}
-          </div>
+          {/* Catch all redirect to home */}
+          <Route path="*" element={<Dashboard />} />
+        </Routes>
+      </main>
+    </div>
   );
 }
 

@@ -46,8 +46,8 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="container py-5 d-flex justify-content-center align-items-center" style={{ minHeight: '80vh' }}>
-      <div className="card glass-card p-4 p-md-5 border w-100" style={{ maxWidth: '480px', borderColor: 'var(--border-color)' }}>
+    <div className="container py-4 py-md-5 d-flex justify-content-center flex-grow-1">
+      <div className="card glass-card p-4 p-md-5 border w-100 my-auto" style={{ maxWidth: '480px', borderColor: 'var(--border-color)' }}>
         <div className="text-center mb-4">
           <div className="d-inline-flex align-items-center justify-content-center rounded-circle p-3 mb-3" style={{ backgroundColor: 'rgba(37, 99, 235, 0.1)', color: 'var(--accent-primary)', width: '60px', height: '60px' }}>
             <i className="bi bi-shield-lock-fill fs-3"></i>

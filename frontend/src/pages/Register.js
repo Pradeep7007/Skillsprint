@@ -56,8 +56,8 @@ const Register = () => {
   };
 
   return (
-    <div className="container py-5 d-flex justify-content-center align-items-center" style={{ minHeight: '80vh' }}>
-      <div className="card glass-card p-4 p-md-5 border w-100" style={{ maxWidth: '520px', borderColor: 'var(--border-color)' }}>
+    <div className="container py-4 py-md-5 d-flex justify-content-center flex-grow-1">
+      <div className="card glass-card p-4 p-md-5 border w-100 my-auto" style={{ maxWidth: '520px', borderColor: 'var(--border-color)' }}>
         
         {/* Toast notification */}
         {toastMessage && (
