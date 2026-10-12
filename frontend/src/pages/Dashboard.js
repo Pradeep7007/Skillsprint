@@ -235,20 +235,20 @@ const Dashboard = () => {
   return (
     <div className="container py-4 py-md-5">
       {/* Welcome Banner */}
-      <div className="card glass-card p-4 p-md-5 border mb-4 mb-md-5 shadow-sm text-center text-md-start" style={{ borderColor: 'var(--border-color)' }}>
-        <div className="row align-items-center">
+      <div className="card glass-card py-3 px-3 px-md-4 border mb-4 shadow-sm text-center text-md-start" style={{ borderColor: 'var(--border-color)' }}>
+        <div className="row align-items-center g-2">
           <div className="col-12 col-md-8">
-            <h1 className="fw-extrabold mb-2" style={{ color: 'var(--text-primary)' }}>
+            <h2 className="h4 fw-bold mb-1" style={{ color: 'var(--text-primary)' }}>
               Welcome, <span style={{ color: 'var(--accent-primary)' }}>{user?.name || 'Student'}</span>!
-            </h1>
-            <p className="text-muted fs-5 mb-0">
+            </h2>
+            <p className="text-muted small mb-0">
               Student Practice & Assessment Hub — Select a category to write a proctored exam, or build a custom test selecting multiple topics of your choice.
             </p>
           </div>
-          <div className="col-12 col-md-4 text-center text-md-end mt-4 mt-md-0">
-            <div className="p-3 bg-opacity-10 bg-primary rounded-4 d-inline-block" style={{ border: '1px solid rgba(99, 102, 241, 0.2)' }}>
-              <i className="bi bi-shield-check fs-2 text-primary"></i>
-              <div className="fw-bold mt-1 small text-uppercase">Proctored System</div>
+          <div className="col-12 col-md-4 text-center text-md-end mt-2 mt-md-0">
+            <div className="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill bg-opacity-10 bg-primary" style={{ border: '1px solid rgba(99, 102, 241, 0.2)' }}>
+              <i className="bi bi-shield-check fs-5 text-primary"></i>
+              <span className="fw-bold small text-uppercase text-primary" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>Proctored System</span>
             </div>
           </div>
         </div>
