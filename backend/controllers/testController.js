@@ -65,97 +65,164 @@ const RECOMMENDATIONS = {
 // Default Recommendation for undefined topics
 const DEFAULT_RECOMMENDATION = 'Review basic concepts, practice mock questions, and clarify doubts from online resources.';
 
-// @desc    Start test and get 30 topic-balanced questions
+// @desc    Start test and get topic-balanced questions based on category / topic preferences
 // @route   POST /api/test/start
 // @access  Private
 exports.startTest = async (req, res, next) => {
   try {
-    const { category } = req.body;
+    const { category, categories, topics, subtopics, difficulty, questionCount = 30 } = req.body;
 
-    if (!category) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please specify a test category',
+    let targetCategories = [];
+    if (Array.isArray(categories) && categories.length > 0) {
+      targetCategories = categories;
+    } else if (category && category.toLowerCase() !== 'custom') {
+      targetCategories = [category];
+    }
+
+    let targetTopics = [];
+    if (Array.isArray(topics) && topics.length > 0) {
+      targetTopics.push(...topics);
+    }
+    if (Array.isArray(subtopics) && subtopics.length > 0) {
+      targetTopics.push(...subtopics);
+    }
+
+    let allQuestions = [];
+
+    // Attempt 1: Query matching categories AND topics (with flexible regex matching)
+    if (targetCategories.length > 0 || targetTopics.length > 0) {
+      const primaryQuery = {};
+
+      if (targetCategories.length > 0) {
+        primaryQuery.category = { $in: targetCategories };
+      }
+
+      if (targetTopics.length > 0) {
+        const topicRegexes = targetTopics.map((t) => {
+          const clean = t.replace(/[^a-zA-Z0-9 ]/g, '').trim();
+          const words = clean.split(/\s+/).filter((w) => w.length > 2 || ['OS', 'CI', 'SI', 'LCM', 'HCF', 'OOP', 'SQL'].includes(w.toUpperCase()));
+          if (words.length > 0) {
+            return new RegExp(words.join('|'), 'i');
+          }
+          return new RegExp(clean, 'i');
+        });
+
+        primaryQuery.$or = [
+          { topic: { $in: targetTopics } },
+          { subtopic: { $in: targetTopics } },
+          { topic: { $in: topicRegexes } },
+          { subtopic: { $in: topicRegexes } },
+        ];
+      }
+
+      if (difficulty && difficulty !== 'All') {
+        primaryQuery.difficulty = difficulty;
+      }
+
+      allQuestions = await Question.find(primaryQuery);
+    }
+
+    // Attempt 2: If topics filter yielded 0, query target categories
+    if (allQuestions.length === 0 && targetCategories.length > 0) {
+      const catQuery = { category: { $in: targetCategories } };
+      if (difficulty && difficulty !== 'All') catQuery.difficulty = difficulty;
+      allQuestions = await Question.find(catQuery);
+    }
+
+    // Attempt 3: If target topics filter yielded 0, query target topics across all categories
+    if (allQuestions.length === 0 && targetTopics.length > 0) {
+      const topicRegexes = targetTopics.map((t) => {
+        const clean = t.replace(/[^a-zA-Z0-9 ]/g, '').trim();
+        return new RegExp(clean, 'i');
+      });
+      allQuestions = await Question.find({
+        $or: [
+          { topic: { $in: targetTopics } },
+          { subtopic: { $in: targetTopics } },
+          { topic: { $in: topicRegexes } },
+        ],
       });
     }
 
-    // Get all questions matching this category
-    const allQuestions = await Question.find({ category });
+    // Attempt 4: Fallback to all questions in database
+    if (allQuestions.length === 0) {
+      allQuestions = await Question.find({});
+    }
 
     if (allQuestions.length === 0) {
       return res.status(404).json({
         success: false,
-        message: `No questions found for category: ${category}`,
+        message: 'No practice questions found in database.',
       });
     }
 
-    // Group questions by topic
+    // Group questions by topic for balanced sampling
     const questionsByTopic = {};
     allQuestions.forEach((q) => {
-      if (!questionsByTopic[q.topic]) {
-        questionsByTopic[q.topic] = [];
+      const topicKey = q.topic || q.category;
+      if (!questionsByTopic[topicKey]) {
+        questionsByTopic[topicKey] = [];
       }
-      questionsByTopic[q.topic].push(q);
+      questionsByTopic[topicKey].push(q);
     });
 
-    const topics = Object.keys(questionsByTopic);
+    const topicKeys = Object.keys(questionsByTopic);
+    const numToPick = Math.min(parseInt(questionCount, 10) || 30, allQuestions.length);
 
-    // Select exactly 30 questions maintaining balanced topic distribution
-    const selectedQuestions = [];
-    const targetCount = Math.min(30, allQuestions.length);
-
-    // Deep clone and shuffle question pools inside each topic
     const topicPools = {};
-    topics.forEach((topic) => {
-      topicPools[topic] = shuffleArray(questionsByTopic[topic]);
+    topicKeys.forEach((tKey) => {
+      topicPools[tKey] = shuffleArray(questionsByTopic[tKey]);
     });
 
-    let currentTopicIndex = 0;
-    // Fisher-Yates shuffle the topics array to pick topics in random order
-    let shuffledTopics = shuffleArray(topics);
+    const selectedQuestions = [];
+    let shuffledTopics = shuffleArray(topicKeys);
 
-    while (selectedQuestions.length < targetCount) {
+    while (selectedQuestions.length < numToPick) {
       let addedInThisCycle = false;
 
       for (let i = 0; i < shuffledTopics.length; i++) {
-        const topic = shuffledTopics[i];
-        if (topicPools[topic] && topicPools[topic].length > 0) {
-          selectedQuestions.push(topicPools[topic].pop());
+        const tKey = shuffledTopics[i];
+        if (topicPools[tKey] && topicPools[tKey].length > 0) {
+          selectedQuestions.push(topicPools[tKey].pop());
           addedInThisCycle = true;
         }
 
-        if (selectedQuestions.length === targetCount) {
+        if (selectedQuestions.length === numToPick) {
           break;
         }
       }
 
-      // If we cycled through all topics and added nothing, we must break to avoid infinite loop
       if (!addedInThisCycle) {
         break;
       }
     }
 
-    // Final shuffle of the selected questions
+    // Final shuffle
     const finalQuestions = shuffleArray(selectedQuestions);
 
-    // Map questions to response format, shuffling options, and removing correct answer / explanation
-    const clientQuestions = finalQuestions.map((q, idx) => {
-      // Shuffle options using Fisher-Yates
-      const shuffledOptions = shuffleArray(q.options);
+    const clientQuestions = finalQuestions.map((q) => ({
+      _id: q._id,
+      category: q.category,
+      topic: q.topic,
+      subtopic: q.subtopic || '',
+      difficulty: q.difficulty,
+      question: q.question,
+      options: shuffleArray(q.options),
+    }));
 
-      return {
-        _id: q._id,
-        category: q.category,
-        topic: q.topic,
-        difficulty: q.difficulty,
-        question: q.question,
-        options: shuffledOptions,
-      };
-    });
+    // Formulate clean display category title
+    let displayCategory = category || 'Custom Practice Test';
+    if (targetCategories.length > 0 && targetCategories.length < 4) {
+      displayCategory = `Custom (${targetCategories.join(', ')})`;
+    } else if (targetTopics.length > 0) {
+      displayCategory = `Custom (${targetTopics.slice(0, 3).join(', ')}${targetTopics.length > 3 ? '...' : ''})`;
+    } else if (targetCategories.length === 4) {
+      displayCategory = 'Full Multi-Category Test';
+    }
 
     res.status(200).json({
       success: true,
-      category,
+      category: displayCategory,
       count: clientQuestions.length,
       questions: clientQuestions,
     });

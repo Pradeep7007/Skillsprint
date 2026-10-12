@@ -12,6 +12,11 @@ const QuestionSchema = new mongoose.Schema(
       required: [true, 'Please add a topic'],
       trim: true,
     },
+    subtopic: {
+      type: String,
+      trim: true,
+      default: '',
+    },
     difficulty: {
       type: String,
       required: [true, 'Please add difficulty level'],

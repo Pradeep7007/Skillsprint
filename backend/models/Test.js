@@ -47,7 +47,6 @@ const TestSchema = new mongoose.Schema(
     category: {
       type: String,
       required: [true, 'Please specify the test category'],
-      enum: ['Aptitude', 'Logical', 'Verbal', 'Technical'],
     },
     score: {
       type: Number,

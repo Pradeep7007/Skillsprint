@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { ThemeContext } from '../context/ThemeContext';
@@ -11,12 +11,14 @@ import FormattedQuestion from '../components/FormattedQuestion';
 const TestPage = () => {
   const { category } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useContext(AuthContext);
   const { theme, toggleTheme } = useContext(ThemeContext);
 
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentIdx, setCurrentIdx] = useState(0);
+  const [displayTitle, setDisplayTitle] = useState(category);
 
   // Exam stats & answer states
   // answers: { questionId: selectedOptionText }
@@ -39,10 +41,20 @@ const TestPage = () => {
     const fetchQuestions = async () => {
       try {
         setLoading(true);
-        const response = await axios.post('/test/start', { category });
+        const payload = { category };
+        if (location.state?.categories) payload.categories = location.state.categories;
+        if (location.state?.topics) payload.topics = location.state.topics;
+        if (location.state?.subtopics) payload.subtopics = location.state.subtopics;
+        if (location.state?.difficulty) payload.difficulty = location.state.difficulty;
+        if (location.state?.questionCount) payload.questionCount = location.state.questionCount;
+
+        const response = await axios.post('/test/start', payload);
         if (response.data.success) {
           const fetchedQs = response.data.questions;
           setQuestions(fetchedQs);
+          if (response.data.category) {
+            setDisplayTitle(response.data.category);
+          }
 
           // Initialize statuses
           const initialStatuses = {};
@@ -62,7 +74,7 @@ const TestPage = () => {
     };
 
     fetchQuestions();
-  }, [category, navigate]);
+  }, [category, navigate, location.state]);
 
   // Handle proctor violation warnings (no auto-submit limit)
   const handleViolation = (type, details, count) => {
@@ -99,7 +111,7 @@ const TestPage = () => {
 
     try {
       const response = await axios.post('/test/submit', {
-        category,
+        category: displayTitle || category,
         answers: formattedAnswers,
         timeTaken,
         violationsCount: warningCount,
@@ -129,50 +141,57 @@ const TestPage = () => {
     startTime.current = Date.now();
   };
 
-  // Navigation handlers
+  // Navigation & Option handlers
   const handleQuestionSelect = (idx) => {
-    updateStatusForCurrent(currentIdx);
-    
+    if (idx < 0 || idx >= questions.length) return;
+
+    // Save current question state before switching
+    const currentQ = questions[currentIdx];
+    if (currentQ) {
+      const currentId = currentQ._id;
+      setQuestionStatuses((prev) => {
+        if (selectedAnswers[currentId] || tempOption) {
+          return { ...prev, [currentId]: prev[currentId] === 'marked' ? 'marked' : 'answered' };
+        }
+        return { ...prev, [currentId]: prev[currentId] === 'marked' ? 'marked' : 'visited' };
+      });
+    }
+
     setCurrentIdx(idx);
-    const qId = questions[idx]._id;
-    setTempOption(selectedAnswers[qId] || '');
+    const targetQId = questions[idx]._id;
+    const existingAns = selectedAnswers[targetQId] || '';
+    setTempOption(existingAns);
 
     setQuestionStatuses((prev) => ({
       ...prev,
-      [qId]: prev[qId] === 'unvisited' ? 'visited' : prev[qId],
+      [targetQId]: existingAns
+        ? (prev[targetQId] === 'marked' ? 'marked' : 'answered')
+        : (prev[targetQId] === 'marked' ? 'marked' : 'visited'),
     }));
-  };
-
-  const updateStatusForCurrent = (idx) => {
-    if (!questions[idx]) return;
-    const qId = questions[idx]._id;
-    setQuestionStatuses((prev) => {
-      if (selectedAnswers[qId]) {
-        return { ...prev, [qId]: 'answered' };
-      }
-      if (prev[qId] === 'marked') {
-        return prev[qId];
-      }
-      return { ...prev, [qId]: 'visited' };
-    });
   };
 
   const handleOptionChange = (option) => {
     setTempOption(option);
+    if (questions[currentIdx]) {
+      const qId = questions[currentIdx]._id;
+      setSelectedAnswers((prev) => ({ ...prev, [qId]: option }));
+      setQuestionStatuses((prev) => ({
+        ...prev,
+        [qId]: prev[qId] === 'marked' ? 'marked' : 'answered',
+      }));
+    }
   };
 
   const handleSaveAndNext = () => {
+    if (!questions[currentIdx]) return;
     const qId = questions[currentIdx]._id;
 
-    // Save option
     if (tempOption) {
       setSelectedAnswers((prev) => ({ ...prev, [qId]: tempOption }));
-      setQuestionStatuses((prev) => ({ ...prev, [qId]: 'answered' }));
-    } else {
-      const newAnswers = { ...selectedAnswers };
-      delete newAnswers[qId];
-      setSelectedAnswers(newAnswers);
-      setQuestionStatuses((prev) => ({ ...prev, [qId]: 'visited' }));
+      setQuestionStatuses((prev) => ({
+        ...prev,
+        [qId]: prev[qId] === 'marked' ? 'marked' : 'answered',
+      }));
     }
 
     if (currentIdx < questions.length - 1) {
@@ -184,6 +203,7 @@ const TestPage = () => {
   };
 
   const handleMarkForReview = () => {
+    if (!questions[currentIdx]) return;
     const qId = questions[currentIdx]._id;
 
     if (tempOption) {
@@ -199,6 +219,7 @@ const TestPage = () => {
 
   const handleClearResponse = () => {
     setTempOption('');
+    if (!questions[currentIdx]) return;
     const qId = questions[currentIdx]._id;
     const newAnswers = { ...selectedAnswers };
     delete newAnswers[qId];
@@ -235,7 +256,7 @@ const TestPage = () => {
               <i className="bi bi-info-circle-fill me-2"></i> Assessment Details:
             </div>
             <ul className="list-unstyled mb-0 ps-3 text-secondary" style={{ fontSize: '0.85rem' }}>
-              <li>• <strong>Subject:</strong> <span className="text-capitalize">{category}</span></li>
+              <li>• <strong>Subject:</strong> <span className="text-capitalize">{displayTitle}</span></li>
               <li>• <strong>Total Questions:</strong> {questions.length}</li>
               <li>• <strong>Duration:</strong> 30 Minutes</li>
               <li>• <strong>Policy:</strong> Tab switches and fullscreen exits are strictly logged</li>
@@ -295,12 +316,17 @@ const TestPage = () => {
         {/* Left: Test Category Title & Tag */}
         <div className="d-flex align-items-center gap-2">
           <i className="bi bi-shield-lock-fill text-primary fs-5"></i>
-          <span className="fw-bold text-capitalize text-truncate" style={{ maxWidth: '240px' }}>
-            {category} Assessment
+          <span className="fw-bold text-capitalize text-truncate" style={{ maxWidth: '180px' }}>
+            {displayTitle}
           </span>
-          <span className="badge bg-primary-subtle text-primary border d-none d-sm-inline-block small">
-            Standard
-          </span>
+          <button
+            className="btn btn-sm btn-outline-primary d-md-none py-0.5 px-2 fw-semibold"
+            style={{ fontSize: '0.75rem' }}
+            data-bs-toggle="modal"
+            data-bs-target="#mobilePaletteModal"
+          >
+            <i className="bi bi-grid-3x3-gap-fill me-1"></i> Palette
+          </button>
         </div>
 
         {/* Center: Question Progress */}
@@ -324,16 +350,16 @@ const TestPage = () => {
         <div className="d-flex align-items-center gap-2">
           {/* Violations Badge */}
           <span
-            className={`badge d-flex align-items-center py-1.5 px-2.5 ${
+            className={`badge d-flex align-items-center py-1.5 px-2 ${
               warningCount > 0
                 ? 'bg-danger-subtle text-danger border border-danger-subtle'
                 : 'bg-success-subtle text-success border border-success-subtle'
             }`}
-            style={{ fontSize: '0.775rem' }}
+            style={{ fontSize: '0.75rem' }}
             title="Integrity Violations Logged"
           >
             <i className={`bi ${warningCount > 0 ? 'bi-exclamation-octagon-fill' : 'bi-shield-check'} me-1`}></i>
-            Violations: {warningCount}
+            <span className="d-none d-sm-inline">Violations: </span>{warningCount}
           </span>
 
           {/* Theme Switcher */}
@@ -344,15 +370,15 @@ const TestPage = () => {
             style={{
               color: 'var(--text-primary)',
               borderColor: 'var(--border-color)',
-              width: '32px',
-              height: '32px',
+              width: '30px',
+              height: '30px',
               backgroundColor: 'var(--bg-tertiary)',
             }}
           >
             {theme === 'dark' ? (
-              <i className="bi bi-sun-fill text-warning" style={{ fontSize: '0.85rem' }}></i>
+              <i className="bi bi-sun-fill text-warning" style={{ fontSize: '0.8rem' }}></i>
             ) : (
-              <i className="bi bi-moon-stars-fill text-primary" style={{ fontSize: '0.85rem' }}></i>
+              <i className="bi bi-moon-stars-fill text-primary" style={{ fontSize: '0.8rem' }}></i>
             )}
           </button>
 
@@ -363,7 +389,7 @@ const TestPage = () => {
         </div>
       </header>
 
-      {/* Main Examination Viewport Body (Fits 100% into remaining height, no page scroll) */}
+      {/* Main Examination Viewport Body */}
       <div className="exam-content-area">
         
         {/* Left Column: Examination Engine */}
@@ -373,24 +399,24 @@ const TestPage = () => {
           <div className="px-3 py-2 border-bottom d-flex align-items-center justify-content-between flex-shrink-0" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
             <div className="d-flex align-items-center gap-2">
               <span className="badge bg-primary px-2.5 py-1 text-white fw-bold" style={{ fontSize: '0.8rem' }}>
-                Question {currentIdx + 1}
+                Q {currentIdx + 1} / {questions.length}
               </span>
               <span className="badge bg-secondary-subtle text-secondary border text-capitalize" style={{ fontSize: '0.75rem' }}>
                 {currentQuestion?.difficulty || 'Standard'}
               </span>
             </div>
-            <span className="text-muted small fw-semibold text-truncate ms-2" style={{ maxWidth: '280px' }}>
+            <span className="text-muted small fw-semibold text-truncate ms-2" style={{ maxWidth: '200px' }}>
               <i className="bi bi-tag-fill me-1 text-primary small"></i>
               {currentQuestion?.topic}
             </span>
           </div>
 
-          {/* Scrollable Question & Options Body (Only this container scrolls if content is large) */}
+          {/* Scrollable Question & Options Body */}
           <div className="exam-question-body">
             
             {/* Question Statement Box */}
             <div className="p-3 rounded-3 border mb-3" style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-color)' }}>
-              <div className="fw-semibold mb-0" style={{ fontSize: '1.05rem', color: 'var(--text-primary)' }}>
+              <div className="fw-semibold mb-0" style={{ fontSize: '1rem', color: 'var(--text-primary)' }}>
                 <FormattedQuestion text={currentQuestion?.question} />
               </div>
             </div>
@@ -418,7 +444,7 @@ const TestPage = () => {
                     <label
                       className="form-check-label w-100 fw-medium mb-0"
                       htmlFor={`option-${oIdx}`}
-                      style={{ cursor: 'pointer', fontSize: '0.925rem', color: isChecked ? 'var(--accent-primary)' : 'var(--text-primary)' }}
+                      style={{ cursor: 'pointer', fontSize: '0.9rem', color: isChecked ? 'var(--accent-primary)' : 'var(--text-primary)' }}
                     >
                       <FormattedQuestion text={option} isOption={true} />
                     </label>
@@ -428,51 +454,54 @@ const TestPage = () => {
             </div>
           </div>
 
-          {/* Action Footer (Always pinned at the bottom of the question card) */}
+          {/* Action Footer Bar (Pinned at bottom of viewport) */}
           <div className="exam-footer-bar">
-            <div className="d-flex gap-2">
+            <div className="d-flex gap-1.5 gap-sm-2">
               <button
-                className="btn btn-sm btn-outline-secondary px-3 py-1.5 fw-medium"
+                className="btn btn-sm btn-outline-secondary px-2.5 py-1 fw-medium"
                 disabled={currentIdx === 0}
                 onClick={() => handleQuestionSelect(currentIdx - 1)}
-                style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
+                style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)', fontSize: '0.8rem' }}
               >
-                <i className="bi bi-chevron-left me-1"></i>
-                Previous
+                <i className="bi bi-chevron-left me-0.5"></i>
+                <span className="d-none d-sm-inline">Prev</span>
               </button>
               <button
-                className="btn btn-sm btn-outline-warning px-3 py-1.5 fw-medium"
+                className="btn btn-sm btn-outline-warning px-2.5 py-1 fw-medium"
                 onClick={handleMarkForReview}
+                style={{ fontSize: '0.8rem' }}
               >
-                <i className="bi bi-bookmark-fill me-1"></i>
-                Mark for Review
+                <i className="bi bi-bookmark-fill me-0.5"></i>
+                <span className="d-none d-sm-inline">Review</span>
               </button>
             </div>
-            <div className="d-flex gap-2">
+            <div className="d-flex gap-1.5 gap-sm-2">
               <button
-                className="btn btn-sm btn-outline-danger px-3 py-1.5 fw-medium"
+                className="btn btn-sm btn-outline-danger px-2.5 py-1 fw-medium"
                 onClick={handleClearResponse}
+                style={{ fontSize: '0.8rem' }}
               >
-                Clear Response
+                Clear
               </button>
               <button
-                className="btn btn-sm btn-primary-custom px-4 py-1.5 fw-semibold"
+                className="btn btn-sm btn-primary-custom px-3 py-1 fw-semibold"
                 onClick={handleSaveAndNext}
+                style={{ fontSize: '0.8rem' }}
               >
                 {currentIdx < questions.length - 1 ? (
                   <>
-                    Save & Next <i className="bi bi-chevron-right ms-1"></i>
+                    Save & Next <i className="bi bi-chevron-right ms-0.5"></i>
                   </>
                 ) : (
-                  'Save & Review'
+                  'Save & Submit'
                 )}
               </button>
             </div>
           </div>
         </div>
 
-        {/* Right Column: Question Palette & Submit Action */}
-        <div className="exam-sidebar-column glass-card border">
+        {/* Right Column: Question Palette & Submit Action (Desktop Only) */}
+        <div className="exam-sidebar-column glass-card border d-none d-md-flex">
           
           {/* Palette Header */}
           <div className="px-3 py-2 border-bottom d-flex align-items-center justify-content-between flex-shrink-0" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
@@ -504,7 +533,7 @@ const TestPage = () => {
             </div>
           </div>
 
-          {/* Palette Buttons Grid (Scrolls only if questions overflow) */}
+          {/* Palette Buttons Grid */}
           <div className="exam-palette-scroll p-2">
             <div className="exam-palette-grid">
               {questions.map((q, idx) => {
@@ -534,7 +563,7 @@ const TestPage = () => {
             </div>
           </div>
 
-          {/* Bottom Pinned Submit Section (Always visible without scrolling) */}
+          {/* Bottom Pinned Submit Section */}
           <div className="p-2.5 border-top flex-shrink-0" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
             <button
               id="confirmSubmitBtn"
@@ -546,6 +575,79 @@ const TestPage = () => {
               <i className="bi bi-send-check-fill"></i>
               Submit Exam
             </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Question Palette Drawer Modal */}
+      <div className="modal fade" id="mobilePaletteModal" tabIndex="-1" aria-labelledby="mobilePaletteModalLabel" aria-hidden="true">
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content glass-card border-0" style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+            <div className="modal-header border-bottom py-2" style={{ borderColor: 'var(--border-color)' }}>
+              <h6 className="modal-title fw-bold" id="mobilePaletteModalLabel">
+                <i className="bi bi-grid-3x3-gap-fill text-primary me-2"></i>
+                Question Palette ({answeredCount}/{questions.length} Solved)
+              </h6>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" style={{ filter: theme === 'dark' ? 'invert(1)' : 'none' }}></button>
+            </div>
+            <div className="modal-body p-3">
+              <div className="p-2 rounded-2 mb-3" style={{ backgroundColor: 'var(--bg-tertiary)', fontSize: '0.75rem' }}>
+                <div className="row g-2 text-muted fw-semibold">
+                  <div className="col-6 d-flex align-items-center">
+                    <span className="palette-btn answered me-1.5" style={{ width: '13px', height: '13px', minWidth: '13px' }}></span>
+                    <span>Answered</span>
+                  </div>
+                  <div className="col-6 d-flex align-items-center">
+                    <span className="palette-btn marked me-1.5" style={{ width: '13px', height: '13px', minWidth: '13px' }}></span>
+                    <span>Review</span>
+                  </div>
+                  <div className="col-6 d-flex align-items-center">
+                    <span className="palette-btn not-answered me-1.5" style={{ width: '13px', height: '13px', minWidth: '13px' }}></span>
+                    <span>Visited</span>
+                  </div>
+                  <div className="col-6 d-flex align-items-center">
+                    <span className="palette-btn unvisited me-1.5" style={{ width: '13px', height: '13px', minWidth: '13px' }}></span>
+                    <span>Unvisited</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="exam-palette-grid mb-3">
+                {questions.map((q, idx) => {
+                  const qId = q._id;
+                  let statusClass = 'unvisited';
+                  if (idx === currentIdx) {
+                    statusClass = 'current';
+                  } else {
+                    const status = questionStatuses[qId];
+                    if (status === 'answered') statusClass = 'answered';
+                    else if (status === 'marked') statusClass = 'marked';
+                    else if (status === 'visited') statusClass = 'not-answered';
+                  }
+
+                  return (
+                    <button
+                      key={qId}
+                      className={`palette-btn ${statusClass}`}
+                      data-bs-dismiss="modal"
+                      onClick={() => handleQuestionSelect(idx)}
+                    >
+                      {idx + 1}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="modal-footer border-top p-2" style={{ borderColor: 'var(--border-color)' }}>
+              <button
+                className="btn btn-danger w-100 py-2 fw-bold"
+                data-bs-dismiss="modal"
+                data-bs-toggle="modal"
+                data-bs-target="#submitConfirmModal"
+              >
+                <i className="bi bi-send-check-fill me-1"></i> Submit Exam
+              </button>
+            </div>
           </div>
         </div>
       </div>

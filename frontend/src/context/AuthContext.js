@@ -12,19 +12,51 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token') || null);
 
   useEffect(() => {
-    // If token exists, configure default Axios headers
+    // Axios 401 interceptor to handle stale/deleted user tokens
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response && error.response.status === 401) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          delete axios.defaults.headers.common['Authorization'];
+          setToken(null);
+          setUser(null);
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    // If token exists, set header and validate user token with backend
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      // Retrieve current user details if needed or use stored user data
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
-      }
+      axios
+        .get('/auth/me')
+        .then((res) => {
+          if (res.data.success) {
+            setUser(res.data.user);
+            localStorage.setItem('user', JSON.stringify(res.data.user));
+          }
+        })
+        .catch(() => {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          delete axios.defaults.headers.common['Authorization'];
+          setToken(null);
+          setUser(null);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     } else {
       delete axios.defaults.headers.common['Authorization'];
       setUser(null);
+      setLoading(false);
     }
-    setLoading(false);
+
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
   }, [token]);
 
   // Login handler

@@ -2,11 +2,66 @@ import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
+const CATEGORY_TOPICS_MAP = {
+  Aptitude: [
+    'Number System',
+    'LCM and HCF',
+    'Percentage',
+    'Profit and Loss',
+    'Ratio and Proportion',
+    'Time and Work',
+    'Time and Distance',
+    'Average',
+    'Simple and Compound Interest',
+    'Ages'
+  ],
+  Logical: [
+    'Blood Relation',
+    'Coding Decoding',
+    'Seating Arrangement',
+    'Direction Sense',
+    'Series',
+    'Syllogism',
+    'Puzzle',
+    'Analogy'
+  ],
+  Verbal: [
+    'Synonyms',
+    'Antonyms',
+    'Grammar',
+    'Error Spotting',
+    'Sentence Completion',
+    'Para Jumbles',
+    'Reading Comprehension',
+    'Vocabulary'
+  ],
+  Technical: [
+    'Computer Networks',
+    'Operating Systems',
+    'DBMS',
+    'Data Structures',
+    'Algorithms',
+    'Java',
+    'OOPS',
+    'Predict Output',
+    'Code Debugging',
+    'Pseudocode'
+  ]
+};
+
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  // Selection & Modal States
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
+
+  // Custom Multi-Select Preferences State
+  const [selectedCategories, setSelectedCategories] = useState(['Aptitude', 'Logical', 'Verbal', 'Technical']);
+  const [selectedTopics, setSelectedTopics] = useState([]);
+  const [topicSearch, setTopicSearch] = useState('');
+  const [questionCount, setQuestionCount] = useState(30);
 
   const categories = [
     {
@@ -58,7 +113,7 @@ const Dashboard = () => {
       id: 'Technical',
       title: 'Technical MCQs',
       desc: 'Evaluate knowledge in core computer science subjects, full-stack web development, output predictions, and algorithms.',
-      topics: 'JavaScript, AngularJS, Node.js, Express.js, MongoDB, HTML & CSS, Computer Networks, OS, DBMS...',
+      topics: 'JavaScript, Computer Networks, OS, DBMS, Data Structures, Algorithms, Java, OOPS...',
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-100 h-100 p-2" style={{ color: 'var(--accent-primary)' }}>
           <polyline points="16 18 22 12 16 6"/>
@@ -70,34 +125,124 @@ const Dashboard = () => {
     }
   ];
 
-  const handleStartTestClick = (category) => {
-    setSelectedCategory(category);
+  // Category Multi-Select Handlers
+  const toggleCategorySelection = (catId) => {
+    setSelectedCategories((prev) => {
+      if (prev.includes(catId)) {
+        return prev.filter((c) => c !== catId);
+      } else {
+        return [...prev, catId];
+      }
+    });
+  };
+
+  const selectAllCategories = () => {
+    setSelectedCategories(Object.keys(CATEGORY_TOPICS_MAP));
+  };
+
+  const clearAllCategories = () => {
+    setSelectedCategories([]);
+    setSelectedTopics([]);
+  };
+
+  // Topic Multi-Select Handlers
+  const toggleTopicSelection = (topicName) => {
+    setSelectedTopics((prev) => {
+      if (prev.includes(topicName)) {
+        return prev.filter((t) => t !== topicName);
+      } else {
+        return [...prev, topicName];
+      }
+    });
+  };
+
+  const selectAllTopicsForCategory = (catId) => {
+    const catTopics = CATEGORY_TOPICS_MAP[catId] || [];
+    setSelectedTopics((prev) => {
+      const merged = new Set([...prev, ...catTopics]);
+      return Array.from(merged);
+    });
+  };
+
+  const clearTopicsForCategory = (catId) => {
+    const catTopics = CATEGORY_TOPICS_MAP[catId] || [];
+    setSelectedTopics((prev) => prev.filter((t) => !catTopics.includes(t)));
+  };
+
+  const selectAllFilteredTopics = () => {
+    const all = [];
+    selectedCategories.forEach((cat) => {
+      const topicsList = CATEGORY_TOPICS_MAP[cat] || [];
+      topicsList.forEach((t) => {
+        if (!topicSearch || t.toLowerCase().includes(topicSearch.toLowerCase())) {
+          all.push(t);
+        }
+      });
+    });
+    setSelectedTopics(Array.from(new Set([...selectedTopics, ...all])));
+  };
+
+  const clearAllSelectedTopics = () => {
+    setSelectedTopics([]);
+  };
+
+  // Start Standard Test Handler
+  const handleStartTestClick = (cat) => {
+    setSelectedCategory(cat);
     setTermsAccepted(false);
   };
 
+  // Confirm Custom Studio Preferences and Open Rules Modal
+  const handleConfirmCustomStudio = (e) => {
+    if (selectedCategories.length === 0 && selectedTopics.length === 0) {
+      if (e) e.stopPropagation();
+      alert('Please select at least one Category or Topic for your custom test.');
+      return;
+    }
+
+    const catTitle = selectedCategories.length === 4 && selectedTopics.length === 0
+      ? 'Full Multi-Category Test'
+      : selectedTopics.length > 0
+      ? `Custom Test (${selectedTopics.length} Topics)`
+      : `Custom Test (${selectedCategories.join(', ')})`;
+
+    setSelectedCategory({
+      id: 'custom',
+      title: catTitle,
+      isCustom: true,
+    });
+    setTermsAccepted(false);
+  };
+
+  // Final Action to Launch Test
   const handleProceedToTest = () => {
     if (termsAccepted && selectedCategory) {
-      // Close modal using bootstrap programmatic trigger or standard location transition
-      const modalElement = document.getElementById('rulesModal');
-      const modal = window.bootstrap?.Modal.getInstance(modalElement);
-      if (modal) {
-        modal.hide();
+      if (selectedCategory.isCustom) {
+        navigate('/test/custom', {
+          state: {
+            categories: selectedCategories,
+            topics: selectedTopics,
+            questionCount,
+            isCustom: true,
+          },
+        });
+      } else {
+        navigate(`/test/${selectedCategory.id}`);
       }
-      navigate(`/test/${selectedCategory.id}`);
     }
   };
 
   return (
-    <div className="container py-5">
+    <div className="container py-4 py-md-5">
       {/* Welcome Banner */}
-      <div className="card glass-card p-4 p-md-5 border mb-5 shadow-sm text-center text-md-start" style={{ borderColor: 'var(--border-color)' }}>
+      <div className="card glass-card p-4 p-md-5 border mb-4 mb-md-5 shadow-sm text-center text-md-start" style={{ borderColor: 'var(--border-color)' }}>
         <div className="row align-items-center">
           <div className="col-12 col-md-8">
             <h1 className="fw-extrabold mb-2" style={{ color: 'var(--text-primary)' }}>
               Welcome, <span style={{ color: 'var(--accent-primary)' }}>{user?.name || 'Student'}</span>!
             </h1>
             <p className="text-muted fs-5 mb-0">
-              Student Practice & Assessment Hub — Select a category below to write proctored practice tests, analyze topic-wise results, and continuously practice to master your skills.
+              Student Practice & Assessment Hub — Select a category to write a proctored exam, or build a custom test selecting multiple topics of your choice.
             </p>
           </div>
           <div className="col-12 col-md-4 text-center text-md-end mt-4 mt-md-0">
@@ -109,15 +254,17 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <h3 className="fw-bold mb-4">Available Test Categories</h3>
+      {/* 1. Standard Test Categories Section */}
+      <div className="d-flex align-items-center justify-content-between mb-4">
+        <h3 className="fw-bold mb-0">Standard Test Categories</h3>
+        <span className="badge bg-secondary-subtle text-secondary border d-none d-sm-inline-block">Standard Proctored Mode</span>
+      </div>
 
-      {/* Grid of Categories */}
-      <div className="row g-4">
+      <div className="row g-4 mb-5">
         {categories.map((cat) => (
           <div className="col-12 col-md-6" key={cat.id}>
             <div className="card glass-card h-100 border p-4 d-flex flex-column" style={{ borderColor: 'var(--border-color)' }}>
               <div className="d-flex align-items-start mb-4">
-                {/* Image Placeholder - Styled SVG Icon */}
                 <div
                   className="rounded-4 me-3 flex-shrink-0"
                   style={{
@@ -157,7 +304,257 @@ const Dashboard = () => {
         ))}
       </div>
 
-      {/* Rules & Regulations Modal */}
+      {/* 2. Custom Multi-Select Practice Studio (Placed under Standard Categories) */}
+      <div className="card glass-card border p-4 p-md-5 shadow-sm text-center text-md-start" style={{ borderColor: 'var(--accent-primary)', background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.06), rgba(16, 185, 129, 0.06))' }}>
+        <div className="row align-items-center">
+          <div className="col-12 col-md-8">
+            <div className="d-flex align-items-center justify-content-center justify-content-md-start gap-2 mb-2">
+              <span className="badge bg-primary text-white fw-bold px-2.5 py-1">New Feature</span>
+              <span className="badge bg-success-subtle text-success border">Multi-Select Enabled</span>
+            </div>
+            <h2 className="fw-extrabold mb-2">Custom Multi-Select Practice Studio</h2>
+            <p className="text-muted mb-0 fs-6">
+              Create a targeted examination environment by selecting multiple categories, topics, and sub-topics of your choice before starting the test.
+            </p>
+          </div>
+          <div className="col-12 col-md-4 text-center text-md-end mt-4 mt-md-0">
+            <button
+              className="btn btn-primary-custom px-4 py-3 fw-bold fs-6 d-inline-flex align-items-center justify-content-center gap-2 w-100 w-md-auto"
+              data-bs-toggle="modal"
+              data-bs-target="#customStudioModal"
+            >
+              <i className="bi bi-sliders fs-5"></i>
+              Open Custom Studio Modal
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* =========================================================
+          MODAL 1: Custom Multi-Select Practice Studio Modal
+         ========================================================= */}
+      <div className="modal fade" id="customStudioModal" tabIndex="-1" aria-labelledby="customStudioModalLabel" aria-hidden="true">
+        <div className="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+          <div className="modal-content glass-card border-0" style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+            <div className="modal-header border-bottom" style={{ borderColor: 'var(--border-color)' }}>
+              <div className="d-flex align-items-center gap-2">
+                <i className="bi bi-sliders text-primary fs-4"></i>
+                <div>
+                  <h5 className="modal-title fw-bold mb-0" id="customStudioModalLabel">
+                    Custom Multi-Select Practice Studio
+                  </h5>
+                  <span className="small text-muted">Select multiple categories, topics, and sub-topics for your test</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                style={{ filter: 'var(--text-primary)' === '#f9fafb' ? 'invert(1)' : 'none' }}
+              ></button>
+            </div>
+
+            <div className="modal-body p-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+              {/* Step 1: Multi-Select Categories */}
+              <div className="mb-4">
+                <div className="d-flex align-items-center justify-content-between mb-2">
+                  <label className="fw-bold text-uppercase small text-muted mb-0">
+                    1. Select Categories (Multiple Choice):
+                  </label>
+                  <div className="d-flex gap-2">
+                    <button type="button" className="btn btn-sm btn-outline-primary py-0.5 px-2 small" onClick={selectAllCategories}>
+                      Select All
+                    </button>
+                    <button type="button" className="btn btn-sm btn-outline-secondary py-0.5 px-2 small" onClick={clearAllCategories}>
+                      Reset
+                    </button>
+                  </div>
+                </div>
+                <div className="row g-3">
+                  {Object.keys(CATEGORY_TOPICS_MAP).map((catName) => {
+                    const isChecked = selectedCategories.includes(catName);
+                    return (
+                      <div key={catName} className="col-6 col-md-3">
+                        <div
+                          className={`p-3 rounded-3 border d-flex align-items-center justify-content-between ${isChecked ? 'border-primary' : ''}`}
+                          onClick={() => toggleCategorySelection(catName)}
+                          style={{
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                            backgroundColor: isChecked ? 'rgba(37, 99, 235, 0.08)' : 'var(--bg-tertiary)',
+                          }}
+                        >
+                          <div className="form-check mb-0">
+                            <input
+                              className="form-check-input me-2"
+                              type="checkbox"
+                              id={`modal-cat-check-${catName}`}
+                              checked={isChecked}
+                              onChange={() => {}}
+                              style={{ cursor: 'pointer' }}
+                            />
+                            <label className="form-check-label fw-bold mb-0" htmlFor={`modal-cat-check-${catName}`} style={{ cursor: 'pointer' }}>
+                              {catName}
+                            </label>
+                          </div>
+                          <span className="badge bg-secondary-subtle text-secondary small border d-none d-sm-inline-block">
+                            {CATEGORY_TOPICS_MAP[catName].length} Topics
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Step 2: Multi-Select Topics & Sub-Topics */}
+              <div className="mb-4">
+                <div className="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between mb-2 gap-2">
+                  <label className="fw-bold text-uppercase small text-muted mb-0">
+                    2. Choose Specific Topics & Sub-Topics (Optional Drill-down):
+                  </label>
+                  <div className="d-flex gap-2 w-100 w-md-auto">
+                    <input
+                      type="text"
+                      className="form-control form-control-sm bg-transparent border text-primary rounded-2"
+                      style={{ minWidth: '200px' }}
+                      placeholder="🔍 Search topics..."
+                      value={topicSearch}
+                      onChange={(e) => setTopicSearch(e.target.value)}
+                    />
+                    <button type="button" className="btn btn-sm btn-outline-secondary text-nowrap" onClick={selectAllFilteredTopics}>
+                      Select Filtered
+                    </button>
+                    <button type="button" className="btn btn-sm btn-outline-danger text-nowrap" onClick={clearAllSelectedTopics}>
+                      Clear Topics
+                    </button>
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-3 border" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)', maxHeight: '300px', overflowY: 'auto' }}>
+                  {selectedCategories.length === 0 ? (
+                    <div className="text-center py-4 text-muted">
+                      <i className="bi bi-info-circle me-1"></i> Please select at least one category above to view topics.
+                    </div>
+                  ) : (
+                    selectedCategories.map((catName) => {
+                      const topicsList = CATEGORY_TOPICS_MAP[catName] || [];
+                      const filteredTopics = topicsList.filter((t) =>
+                        !topicSearch ? true : t.toLowerCase().includes(topicSearch.toLowerCase())
+                      );
+
+                      if (filteredTopics.length === 0) return null;
+
+                      return (
+                        <div key={catName} className="mb-3 pb-2 border-bottom" style={{ borderColor: 'var(--border-color)' }}>
+                          <div className="d-flex align-items-center justify-content-between mb-2">
+                            <span className="fw-bold text-primary small text-uppercase">{catName} Topics</span>
+                            <div className="d-flex gap-2">
+                              <button
+                                type="button"
+                                className="btn btn-link p-0 text-decoration-none small"
+                                style={{ fontSize: '0.75rem' }}
+                                onClick={() => selectAllTopicsForCategory(catName)}
+                              >
+                                Select All {catName}
+                              </button>
+                              <span className="text-muted small">•</span>
+                              <button
+                                type="button"
+                                className="btn btn-link p-0 text-decoration-none small text-danger"
+                                style={{ fontSize: '0.75rem' }}
+                                onClick={() => clearTopicsForCategory(catName)}
+                              >
+                                Clear
+                              </button>
+                            </div>
+                          </div>
+                          <div className="row g-2">
+                            {filteredTopics.map((tName) => {
+                              const isTopicChecked = selectedTopics.includes(tName);
+                              return (
+                                <div key={tName} className="col-12 col-sm-6 col-md-4 col-lg-3">
+                                  <div
+                                    className={`p-2 rounded-2 border d-flex align-items-center ${isTopicChecked ? 'border-primary' : ''}`}
+                                    onClick={() => toggleTopicSelection(tName)}
+                                    style={{
+                                      cursor: 'pointer',
+                                      fontSize: '0.85rem',
+                                      backgroundColor: isTopicChecked ? 'rgba(37, 99, 235, 0.08)' : 'var(--bg-tertiary)',
+                                    }}
+                                  >
+                                    <input
+                                      className="form-check-input me-2 flex-shrink-0"
+                                      type="checkbox"
+                                      id={`modal-topic-${tName}`}
+                                      checked={isTopicChecked}
+                                      onChange={() => {}}
+                                      style={{ cursor: 'pointer' }}
+                                    />
+                                    <label className="form-check-label text-truncate mb-0" htmlFor={`modal-topic-${tName}`} style={{ cursor: 'pointer' }} title={tName}>
+                                      {tName}
+                                    </label>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+
+              {/* Step 3: Question Count */}
+              <div className="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between p-3 rounded-3 border" style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-color)' }}>
+                <div>
+                  <span className="fw-bold small d-block">Test Length:</span>
+                  <span className="text-muted small">Select total questions for your custom test pool</span>
+                </div>
+                <div className="mt-2 mt-sm-0">
+                  <select
+                    className="form-select form-select-sm bg-transparent border text-primary fw-bold"
+                    style={{ width: '140px' }}
+                    value={questionCount}
+                    onChange={(e) => setQuestionCount(Number(e.target.value))}
+                  >
+                    <option value={10}>10 Questions</option>
+                    <option value={15}>15 Questions</option>
+                    <option value={20}>20 Questions</option>
+                    <option value={30}>30 Questions</option>
+                    <option value={60}>60 Questions</option>
+                    <option value={80}>80 Questions</option>
+                    <option value={100}>100 Questions</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-footer border-top d-flex align-items-center justify-content-between" style={{ borderColor: 'var(--border-color)' }}>
+              <div className="small text-muted text-truncate me-2" style={{ maxWidth: '300px' }}>
+                <strong>Summary:</strong> {selectedCategories.length} Categories, {selectedTopics.length > 0 ? `${selectedTopics.length} Topics` : 'All Topics'}
+              </div>
+              <div className="d-flex gap-2">
+                <button type="button" className="btn btn-secondary px-3" data-bs-dismiss="modal">
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary-custom px-4 fw-bold"
+                  data-bs-toggle="modal"
+                  data-bs-target="#rulesModal"
+                  onClick={handleConfirmCustomStudio}
+                >
+                  Proceed to Guidelines <i className="bi bi-arrow-right ms-1"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="modal fade" id="rulesModal" tabIndex="-1" aria-labelledby="rulesModalLabel" aria-hidden="true">
         <div className="modal-dialog modal-dialog-centered modal-lg">
           <div className="modal-content glass-card border-0" style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
@@ -181,6 +578,17 @@ const Dashboard = () => {
                   <strong>Attention:</strong> This is a secure examination environment. Attempting to violate the rules will log warnings in the database for proctor evaluation.
                 </div>
               </div>
+
+              {selectedCategory?.isCustom && (
+                <div className="alert alert-info border-0 p-3 mb-4" style={{ backgroundColor: 'rgba(37, 99, 235, 0.1)', color: 'var(--accent-primary)' }}>
+                  <div className="fw-bold mb-1">Custom Test Configuration:</div>
+                  <ul className="mb-0 small ps-3">
+                    <li>• <strong>Categories Selected:</strong> {selectedCategories.join(', ') || 'None'}</li>
+                    <li>• <strong>Topics Selected:</strong> {selectedTopics.length > 0 ? selectedTopics.join(', ') : 'All topics in selected categories'}</li>
+                    <li>• <strong>Question Limit:</strong> {questionCount} Questions</li>
+                  </ul>
+                </div>
+              )}
 
               <h6 className="fw-bold mb-3">System & Behavioral Rules:</h6>
               <ul className="list-group list-group-flush mb-4 bg-transparent border-0">
